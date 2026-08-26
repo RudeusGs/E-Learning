@@ -1,0 +1,35 @@
+{
+  "name": "elearning-mvp",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "client"
+  ],
+  "engines": {
+    "node": ">=22.13.0",
+    "npm": ">=10"
+  },
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "prepare": "node scripts/prepare-husky.mjs",
+    "dev:client": "npm run dev --workspace @elearning/client",
+    "build:client": "npm run build --workspace @elearning/client",
+    "lint:client": "npm run lint --workspace @elearning/client",
+    "typecheck:client": "npm run type-check --workspace @elearning/client",
+    "test:client": "npm run test --workspace @elearning/client",
+    "check:foundation": "node scripts/verify-foundation.mjs && node scripts/verify-code-structure.mjs",
+    "format": "prettier --write \"**/*.{json,md,yml,yaml,js,mjs,cjs,ts,vue,css,html}\" --ignore-unknown",
+    "format:check": "prettier --check \"**/*.{json,md,yml,yaml,js,mjs,cjs,ts,vue,css,html}\" --ignore-unknown",
+    "precommit": "npm run check:foundation && npm run format:check && npm run lint:client",
+    "verify:client": "npm run lint:client && npm run typecheck:client && npm run test:client && npm run build:client",
+    "verify:server": "dotnet tool restore && dotnet restore Elearning.sln && dotnet format Elearning.sln --verify-no-changes --no-restore && dotnet build Elearning.sln -c Release --no-restore && dotnet test Elearning.sln -c Release --no-build",
+    "verify": "npm run check:foundation && npm run format:check && npm run verify:client && npm run verify:server",
+    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e:list": "playwright test --list --pass-with-no-tests"
+  },
+  "devDependencies": {
+    "husky": "9.1.7",
+    "prettier": "3.6.2",
+    "@playwright/test": "1.62.1"
+  }
+}

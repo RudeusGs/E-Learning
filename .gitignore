@@ -1,0 +1,42 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.pem
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+TestResults/
+coverage/
+
+# Node
+node_modules/
+client/node_modules/
+client/dist/
+client/coverage/
+playwright-report/
+test-results/
+blob-report/
+npm-debug.log*
+
+# Docker/local data
+.postgres-data/
+
+# Generated
+*.tmp
+*.log
+backend_logs.txt

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Elearning.Domain/Elearning.Domain.csproj" />
+  </ItemGroup>
+</Project>

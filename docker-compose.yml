@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+      Jwt__Key: ${Jwt__Key:-}
+      ReverseProxy__KnownNetworks__0: ${REVERSE_PROXY_KNOWN_NETWORK:-172.16.0.0/12}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -1,0 +1,16 @@
+.git
+.github
+.husky
+node_modules
+client/node_modules
+client/dist
+**/bin
+**/obj
+TestResults
+coverage
+.env
+*.zip
+
+playwright-report
+test-results
+blob-report
