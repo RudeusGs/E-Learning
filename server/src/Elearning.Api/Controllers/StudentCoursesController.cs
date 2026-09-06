@@ -21,9 +21,10 @@ public sealed class StudentCoursesController(
     public async Task<ActionResult<CursorPageResponse<StudentCourseResponse>>> GetCourses(
         int limit = RequestValidation.DefaultLimit,
         string? cursor = null,
+        string? progress = null,
         CancellationToken cancellationToken = default) =>
         Ok((await courseCatalog.ExecuteAsync(
-            new ListStudentCoursesQuery(User.GetRequiredUserId(), limit, cursor),
+            new ListStudentCoursesQuery(User.GetRequiredUserId(), limit, cursor, progress),
             cancellationToken)).ToResponse());
 
     [HttpGet(StudentCourseRoutes.ById)]

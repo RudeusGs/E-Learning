@@ -344,3 +344,10 @@ Template:
 ```
 
 Chỉ thêm ADR cho quyết định ảnh hưởng architecture/data/security/contract lâu dài. Không dùng ADR cho tên button hoặc refactor nhỏ.
+## ADR — Server-authoritative lesson completion guardrails (2026-08-29)
+
+Status: Accepted. Supersedes the previous MVP manual-complete/no-threshold convention.
+
+Completion is derived from server records, not a browser button. Video watch state is tracked by bounded heartbeats, checkpoint questions can gate playback, reinforcement is unlocked after video completion, and the required reinforcement threshold is strictly greater than 80%.
+
+We intentionally do not claim YouTube is tamper-proof. Browser-side seek prevention is UX enforcement; server-side eligibility is the security boundary. High-stakes anti-tamper video would require controlled media delivery rather than public YouTube.

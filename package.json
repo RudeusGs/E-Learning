@@ -23,13 +23,10 @@
     "precommit": "npm run check:foundation && npm run format:check && npm run lint:client",
     "verify:client": "npm run lint:client && npm run typecheck:client && npm run test:client && npm run build:client",
     "verify:server": "dotnet tool restore && dotnet restore Elearning.sln && dotnet format Elearning.sln --verify-no-changes --no-restore && dotnet build Elearning.sln -c Release --no-restore && dotnet test Elearning.sln -c Release --no-build",
-    "verify": "npm run check:foundation && npm run format:check && npm run verify:client && npm run verify:server",
-    "test:e2e": "playwright test --pass-with-no-tests",
-    "test:e2e:list": "playwright test --list --pass-with-no-tests"
+    "verify": "npm run check:foundation && npm run format:check && npm run verify:client && npm run verify:server"
   },
   "devDependencies": {
     "husky": "9.1.7",
-    "prettier": "3.6.2",
-    "@playwright/test": "1.62.1"
+    "prettier": "3.6.2"
   }
 }

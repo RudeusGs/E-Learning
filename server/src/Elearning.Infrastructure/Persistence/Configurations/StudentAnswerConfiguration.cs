@@ -25,6 +25,7 @@ public sealed class StudentAnswerConfiguration : IEntityTypeConfiguration<Studen
             .HasForeignKey(answer => answer.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(answer => new { answer.StudentId, answer.QuestionId, answer.AnsweredAtUtc });
+        builder.HasIndex(answer => new { answer.StudentId, answer.QuestionId, answer.IsCorrect });
         builder.HasIndex(answer => new { answer.QuestionId, answer.AnsweredAtUtc });
     }
 }

@@ -15,7 +15,7 @@ internal static class DatabaseRegistration
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is required.");
 
-        services.AddDbContext<ElearningDbContext>((serviceProvider, options) =>
+        services.AddDbContextPool<ElearningDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure(3));
             options.AddInterceptors(serviceProvider.GetServices<IInterceptor>());

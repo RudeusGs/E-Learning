@@ -5,4 +5,5 @@ namespace Elearning.Application.Lessons;
 public sealed record CompleteLessonDto(
     string Status,
     DateTimeOffset CompletedAtUtc,
-    CourseProgressSummaryDto CourseProgress);
+    CourseProgressSummaryDto CourseProgress,
+    long? NextLessonId);

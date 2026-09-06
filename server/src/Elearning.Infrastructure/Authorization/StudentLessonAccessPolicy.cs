@@ -5,21 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elearning.Infrastructure.Authorization;
 
-public sealed class StudentLessonAccessPolicy(
-    ElearningDbContext dbContext,
-    ActiveStudentPolicy activeStudentPolicy)
+public sealed class StudentLessonAccessPolicy(ElearningDbContext dbContext)
 {
     public async Task<StudentLessonAccess> AuthorizeAsync(
         long studentId,
         long lessonId,
         CancellationToken cancellationToken)
     {
-        await activeStudentPolicy.EnsureSatisfiedAsync(studentId, cancellationToken);
         var scope = await LoadScopeAsync(studentId, lessonId, cancellationToken);
         EnsurePublishedAndEnrolled(scope);
-        var previousLessonId = await FindPreviousLessonIdAsync(scope!, cancellationToken);
-        await EnsurePredecessorCompletedAsync(studentId, previousLessonId, cancellationToken);
-        return new StudentLessonAccess(scope!.Id, scope.CourseId, scope.SortOrder, previousLessonId);
+        await EnsurePredecessorCompletedAsync(studentId, scope!.PreviousLessonId, cancellationToken);
+        return new StudentLessonAccess(scope.Id, scope.CourseId, scope.SortOrder, scope.PreviousLessonId);
     }
 
     private Task<LessonAccessScope?> LoadScopeAsync(
@@ -37,7 +33,17 @@ public sealed class StudentLessonAccessPolicy(
                 lesson.Course.Status,
                 lesson.Course.Enrollments.Any(enrollment =>
                     enrollment.StudentId == studentId &&
-                    enrollment.Status == EnrollmentStatus.Active)))
+                    enrollment.Status == EnrollmentStatus.Active),
+                dbContext.Lessons
+                    .Where(previous =>
+                        previous.CourseId == lesson.CourseId &&
+                        previous.Status == LessonStatus.Published &&
+                        (previous.SortOrder < lesson.SortOrder ||
+                         (previous.SortOrder == lesson.SortOrder && previous.Id < lesson.Id)))
+                    .OrderByDescending(previous => previous.SortOrder)
+                    .ThenByDescending(previous => previous.Id)
+                    .Select(previous => (long?)previous.Id)
+                    .FirstOrDefault()))
             .SingleOrDefaultAsync(cancellationToken);
 
     private static void EnsurePublishedAndEnrolled(LessonAccessScope? scope)
@@ -50,21 +56,6 @@ public sealed class StudentLessonAccessPolicy(
             throw new ResourceNotFoundException("Lesson");
         }
     }
-
-    private Task<long?> FindPreviousLessonIdAsync(
-        LessonAccessScope scope,
-        CancellationToken cancellationToken) =>
-        dbContext.Lessons
-            .AsNoTracking()
-            .Where(lesson =>
-                lesson.CourseId == scope.CourseId &&
-                lesson.Status == LessonStatus.Published &&
-                (lesson.SortOrder < scope.SortOrder ||
-                 (lesson.SortOrder == scope.SortOrder && lesson.Id < scope.Id)))
-            .OrderByDescending(lesson => lesson.SortOrder)
-            .ThenByDescending(lesson => lesson.Id)
-            .Select(lesson => (long?)lesson.Id)
-            .FirstOrDefaultAsync(cancellationToken);
 
     private async Task EnsurePredecessorCompletedAsync(
         long studentId,
@@ -94,5 +85,6 @@ public sealed class StudentLessonAccessPolicy(
         int SortOrder,
         LessonStatus LessonStatus,
         CourseStatus CourseStatus,
-        bool HasEnrollment);
+        bool HasEnrollment,
+        long? PreviousLessonId);
 }

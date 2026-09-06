@@ -8,14 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Progress;
 
 public sealed class StudentProgressQueryHandler(
-    ElearningDbContext dbContext,
-    ActiveStudentPolicy activeStudentPolicy) : IStudentProgressQueryHandler
+    ElearningDbContext dbContext) : IStudentProgressQueryHandler
 {
     public async Task<StudentCourseProgressDto> ExecuteAsync(
         GetStudentProgressQuery query,
         CancellationToken cancellationToken)
     {
-        await activeStudentPolicy.EnsureSatisfiedAsync(query.StudentId, cancellationToken);
         await EnsureCourseAccessAsync(query.StudentId, query.CourseId, cancellationToken);
         var rows = await LoadProgressAsync(query.StudentId, query.CourseId, cancellationToken);
         return CreateResponse(query.CourseId, rows);
@@ -49,21 +47,16 @@ public sealed class StudentProgressQueryHandler(
             .Where(lesson => lesson.CourseId == courseId && lesson.Status == LessonStatus.Published)
             .OrderBy(lesson => lesson.SortOrder)
             .ThenBy(lesson => lesson.Id)
-            .Select(lesson => new StudentLessonProgressProjection(
-                lesson.Id,
-                lesson.Title,
-                lesson.Progress
+            .SelectMany(
+                lesson => lesson.Progress
                     .Where(progress => progress.StudentId == studentId)
-                    .Select(progress => (LessonProgressStatus?)progress.Status)
-                    .SingleOrDefault(),
-                lesson.Progress
-                    .Where(progress => progress.StudentId == studentId)
-                    .Select(progress => (DateTimeOffset?)progress.StartedAtUtc)
-                    .SingleOrDefault(),
-                lesson.Progress
-                    .Where(progress => progress.StudentId == studentId)
-                    .Select(progress => progress.CompletedAtUtc)
-                    .SingleOrDefault()))
+                    .DefaultIfEmpty(),
+                (lesson, progress) => new StudentLessonProgressProjection(
+                    lesson.Id,
+                    lesson.Title,
+                    progress == null ? null : progress.Status,
+                    progress == null ? null : progress.StartedAtUtc,
+                    progress == null ? null : progress.CompletedAtUtc))
             .ToListAsync(cancellationToken);
 
     private static StudentCourseProgressDto CreateResponse(

@@ -522,3 +522,22 @@ Production handover phải ghi rõ:
 - migration compatibility.
 
 Repo không tự giả định backup đã tồn tại chỉ vì dùng managed database.
+## Learning Guardrails — 2026-08-29
+
+Added lesson media metadata:
+
+- `Lessons.VideoDurationSeconds` nullable integer, 1..43200 when present.
+
+Added question placement metadata:
+
+- `Questions.Placement`: `Reinforcement | VideoCheckpoint`;
+- `Questions.VideoTimestampSeconds` nullable integer.
+
+Added trusted watch progress to LessonProgress:
+
+- `VideoMaxPositionSeconds`;
+- `VideoLastPositionSeconds`;
+- `VideoHeartbeatAtUtc`;
+- `VideoCompletedAtUtc`.
+
+Indexes support checkpoint lookup and pass-state aggregation: `(LessonId, Placement, VideoTimestampSeconds)` and `(StudentId, QuestionId, IsCorrect)`.

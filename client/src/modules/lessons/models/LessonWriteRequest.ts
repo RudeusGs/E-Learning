@@ -5,6 +5,7 @@ export interface LessonWriteRequest {
   description: string | null
   contentHtml: string | null
   videoUrl: string | null
+  videoDurationSeconds?: number | null
   sortOrder: number
   status: LessonStatus
   version?: number

@@ -19,5 +19,8 @@ public sealed class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(course => course.Version).IsConcurrencyToken();
         builder.HasIndex(course => new { course.Status, course.SortOrder });
         builder.HasIndex(course => course.SortOrder);
+        builder.HasIndex(course => course.Title)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
     }
 }

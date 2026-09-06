@@ -5,9 +5,9 @@ namespace Elearning.Application.Courses;
 
 public interface IAdminCourseQueryHandler
 {
-    Task<CursorPage<CourseDto>> ExecuteAsync(
+    Task<CursorPage<AdminCourseListDto>> ExecuteAsync(
         ListAdminCoursesQuery request,
         CancellationToken cancellationToken);
 
-    Task<CourseDto> ExecuteAsync(GetAdminCourseQuery query, CancellationToken cancellationToken);
+    Task<AdminCourseDetailDto> ExecuteAsync(GetAdminCourseQuery query, CancellationToken cancellationToken);
 }

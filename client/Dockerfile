@@ -9,7 +9,7 @@ RUN npm ci --no-audit --no-fund --ignore-scripts
 COPY client ./client
 RUN npm run build:client
 
-FROM nginx:1.29-alpine AS runtime
+FROM nginx:1.26-alpine AS runtime
 COPY client/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/client/dist /usr/share/nginx/html
 EXPOSE 80

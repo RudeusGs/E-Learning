@@ -1,5 +1,4 @@
 using Elearning.Api.Contracts.Common;
-using Elearning.Api.Contracts.Routing;
 using Elearning.Api.Contracts.Students.Responses;
 using Elearning.Api.Mappings;
 using Elearning.Api.Security;
@@ -9,6 +8,7 @@ using Elearning.Domain;
 using Microsoft.AspNetCore.Mvc;
 using StudentCreateRequest = Elearning.Api.Contracts.Students.Requests.StudentCreateRequest;
 using StudentUpdateRequest = Elearning.Api.Contracts.Students.Requests.StudentUpdateRequest;
+using Elearning.Api.Contracts.Routing;
 
 namespace Elearning.Api.Controllers;
 
@@ -24,14 +24,19 @@ public sealed class AdminStudentsController(
         int limit = RequestValidation.DefaultLimit,
         string? cursor = null,
         string? search = null,
+        AccountStatus? status = null,
         CancellationToken cancellationToken = default) =>
         Ok((await studentQueries.ExecuteAsync(
-            new ListStudentsQuery(limit, cursor, search),
+            new ListStudentsQuery(limit, cursor, search, status),
             cancellationToken)).ToResponse());
 
     [HttpGet(AdminStudentRoutes.ById)]
-    public async Task<ActionResult<StudentDetailResponse>> GetStudent(long id, CancellationToken cancellationToken) =>
-        Ok((await studentQueries.ExecuteAsync(new GetStudentQuery(id), cancellationToken)).ToResponse());
+    public async Task<ActionResult<StudentDetailResponse>> GetStudent(
+        long id,
+        CancellationToken cancellationToken) =>
+        Ok((await studentQueries.ExecuteAsync(
+            new GetStudentQuery(id),
+            cancellationToken)).ToResponse());
 
     [HttpPost]
     public async Task<ActionResult<StudentDetailResponse>> CreateStudent(

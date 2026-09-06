@@ -1,3 +1,4 @@
+
 namespace Elearning.Domain;
 
 public sealed class Lesson
@@ -13,6 +14,7 @@ public sealed class Lesson
     public string? ContentHtml { get; private set; }
     public VideoProvider? VideoProvider { get; private set; }
     public string? VideoExternalId { get; private set; }
+    public int? VideoDurationSeconds { get; private set; }
     public int SortOrder { get; private set; }
     public LessonStatus Status { get; private set; }
     public long Version { get; private set; } = 1;
@@ -31,7 +33,8 @@ public sealed class Lesson
         string? videoExternalId,
         int sortOrder,
         LessonStatus status,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        int? videoDurationSeconds = null)
     {
         if (courseId <= 0)
         {
@@ -53,7 +56,8 @@ public sealed class Lesson
             videoExternalId,
             sortOrder,
             status,
-            now);
+            now,
+            videoDurationSeconds);
         return lesson;
     }
 
@@ -65,15 +69,23 @@ public sealed class Lesson
         string? videoExternalId,
         int sortOrder,
         LessonStatus status,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        int? videoDurationSeconds = null)
     {
-        ValidateDetails(title, videoProvider, videoExternalId, sortOrder, status);
+        ValidateDetails(
+            title,
+            videoProvider,
+            videoExternalId,
+            videoDurationSeconds,
+            sortOrder,
+            status);
 
         Title = title.Trim();
         Description = NormalizeOptional(description);
         ContentHtml = NormalizeOptional(sanitizedContentHtml);
         VideoProvider = videoProvider;
         VideoExternalId = NormalizeOptional(videoExternalId);
+        VideoDurationSeconds = videoDurationSeconds;
         SortOrder = sortOrder;
         Status = status;
         UpdatedAtUtc = now;
@@ -89,6 +101,7 @@ public sealed class Lesson
         string title,
         VideoProvider? videoProvider,
         string? videoExternalId,
+        int? videoDurationSeconds,
         int sortOrder,
         LessonStatus status)
     {
@@ -110,6 +123,22 @@ public sealed class Lesson
         if ((videoProvider is null) != (videoExternalId is null))
         {
             throw new DomainValidationException("Nhà cung cấp video và ID bên ngoài phải được cung cấp cùng nhau.");
+        }
+
+        if (videoProvider is null && videoDurationSeconds is not null)
+        {
+            throw new DomainValidationException("Không được cấu hình thời lượng khi bài học không có video.");
+        }
+
+        if (videoDurationSeconds is <= 0 or > 43200)
+        {
+            throw new DomainValidationException("Thời lượng video phải nằm trong khoảng 1 giây đến 12 giờ.");
+        }
+
+        if (status == LessonStatus.Published && videoProvider is not null && videoDurationSeconds is null)
+        {
+            throw new DomainValidationException(
+                "Bài học có video phải có thời lượng video trước khi xuất bản.");
         }
 
         if (Status == LessonStatus.Archived && status != LessonStatus.Archived)

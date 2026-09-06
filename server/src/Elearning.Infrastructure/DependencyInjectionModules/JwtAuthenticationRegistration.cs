@@ -83,14 +83,35 @@ internal static class JwtAuthenticationRegistration
         }
 
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<ElearningDbContext>();
-        var user = await LoadUserSessionAsync(dbContext, claims.UserId, context.HttpContext.RequestAborted);
-        if (!IsValidUserSession(user, claims.SessionStamp))
+        var now = context.HttpContext.RequestServices.GetRequiredService<TimeProvider>().GetUtcNow();
+
+        var sessionState = await dbContext.Users
+            .AsNoTracking()
+            .Where(candidate => candidate.Id == claims.UserId)
+            .Select(candidate => new
+            {
+                candidate.Status,
+                candidate.SecurityStamp,
+                IsBlacklisted = dbContext.BlacklistedTokens.Any(token =>
+                    token.TokenId == claims.Jti &&
+                    token.UserId == claims.UserId &&
+                    token.ExpiresAtUtc > now)
+            })
+            .SingleOrDefaultAsync(context.HttpContext.RequestAborted);
+
+        if (sessionState is null || sessionState.Status != AccountStatus.Active)
         {
             context.Fail("Account session is no longer valid.");
             return;
         }
 
-        if (await IsBlacklistedAsync(context, dbContext, claims))
+        if (!string.Equals(TokenSecurity.HashSecurityStamp(sessionState.SecurityStamp), claims.SessionStamp, StringComparison.Ordinal))
+        {
+            context.Fail("Account session is no longer valid.");
+            return;
+        }
+
+        if (sessionState.IsBlacklisted)
         {
             context.Fail("Token has been revoked.");
         }
@@ -108,39 +129,5 @@ internal static class JwtAuthenticationRegistration
             : null;
     }
 
-    private static Task<UserSession?> LoadUserSessionAsync(
-        ElearningDbContext dbContext,
-        long userId,
-        CancellationToken cancellationToken) =>
-        dbContext.Users
-            .AsNoTracking()
-            .Where(candidate => candidate.Id == userId)
-            .Select(candidate => new UserSession(candidate.Status, candidate.SecurityStamp))
-            .SingleOrDefaultAsync(cancellationToken);
-
-    private static bool IsValidUserSession(UserSession? user, string sessionStamp) =>
-        user is not null &&
-        user.Status == AccountStatus.Active &&
-        string.Equals(
-            TokenSecurity.HashSecurityStamp(user.SecurityStamp),
-            sessionStamp,
-            StringComparison.Ordinal);
-
-    private static Task<bool> IsBlacklistedAsync(
-        TokenValidatedContext context,
-        ElearningDbContext dbContext,
-        RequiredClaims claims)
-    {
-        var now = context.HttpContext.RequestServices.GetRequiredService<TimeProvider>().GetUtcNow();
-        return dbContext.BlacklistedTokens
-            .AsNoTracking()
-            .AnyAsync(
-                token => token.TokenId == claims.Jti &&
-                         token.UserId == claims.UserId &&
-                         token.ExpiresAtUtc > now,
-                context.HttpContext.RequestAborted);
-    }
-
     private sealed record RequiredClaims(long UserId, string SessionStamp, string Jti);
-    private sealed record UserSession(AccountStatus Status, string? SecurityStamp);
 }

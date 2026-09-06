@@ -2,7 +2,7 @@
 
 Hệ thống E-Learning (phiên bản MVP) được xây dựng trên nền tảng **.NET 10**, **Vue 3** và **PostgreSQL** với kiến trúc sẵn sàng cho môi trường Production.
 
-> Đây là bộ khung (Skeleton) hoàn chỉnh của dự án E-Learning. Hiện tại, luồng Xác thực người dùng (Authentication) cốt lõi đã được hoàn thiện. Các tính năng nghiệp vụ khác đang trong giai đoạn phát triển. Hệ thống đã bao gồm đầy đủ Docker, CI/CD, bộ công cụ kiểm thử (Testing) và cấu trúc phân tầng (Clean Architecture).
+> Đây là phiên bản MVP hoàn chỉnh của hệ thống E-Learning. Các luồng quản trị khóa học, bài học, câu hỏi, học viên, enrollment, học tuần tự, làm bài, tiến độ và dashboard đã được nối end-to-end trên nền tảng Clean Architecture.
 
 ## Công nghệ sử dụng (Tech Stack)
 
@@ -89,6 +89,14 @@ Sau đó truy cập:
 - Frontend: `http://localhost:5173`
 - Backend Health: `http://localhost:5173/api/health` (thông qua Reverse Proxy của Nginx)
 
+Ở môi trường Development, backend tự chạy migration và tạo dữ liệu demo idempotent:
+
+- Admin: `admin@elearning.local` / `MindX@1234`
+- Student: `student@elearning.local` / `Student@1234`
+- Khóa học `Python Basic` gồm 5 bài, mỗi bài 3 câu hỏi
+
+Demo seed không chạy ở Production.
+
 ## Kiểm tra mã nguồn (Code Quality & Testing)
 
 Dự án sử dụng Husky để tự động kiểm tra code trước khi commit và push. Bạn có thể tự chạy thủ công:
@@ -130,4 +138,4 @@ Hãy bắt đầu đọc từ các tài liệu sau để nắm rõ dự án:
 
 ## Tình trạng hiện tại (Current state)
 
-Dự án đã hoàn thiện bộ khung kỹ thuật (Technical Foundation) và hệ thống **Xác thực người dùng (Authentication & Authorization)**. Các module nghiệp vụ tiếp theo như Course, Lesson, Student, Enrollment, Exercise và Progress sẽ được phát triển trong các bản cập nhật tới.
+Dự án đã hoàn thiện bộ khung kỹ thuật, xác thực/phân quyền và toàn bộ nghiệp vụ MVP: Dashboard, Course, Lesson, Exercise, Student, Enrollment, Learning Path và Progress. Backend có migration/seed Development, frontend có đầy đủ route theo đặc tả, và các luồng chính được bao phủ bởi unit, integration và Playwright E2E tests.

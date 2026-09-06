@@ -443,3 +443,26 @@ Task lớn nên ghi ngắn trong PR/report:
 - Security negative cases.
 - Known limitations.
 - Rollback/revert note nếu thay đổi rủi ro.
+## Learning Guardrails DoD — 2026-08-29
+
+Required automated coverage:
+
+- Complete before Start -> rejected.
+- Video lesson without trusted duration -> cannot be completed.
+- Heartbeat cannot jump far beyond elapsed wall time.
+- Heartbeat cannot advance past an unanswered checkpoint.
+- Checkpoint answer before its timestamp -> rejected.
+- Reinforcement answer before video completion -> rejected.
+- Reinforcement score at or below 80% -> complete rejected.
+- Score above 80%, video complete and checkpoints passed -> complete succeeds.
+- Completed lesson remains idempotently completed.
+- Query-count/load regression checks remain bounded.
+
+Required browser/E2E coverage:
+
+- forward seek snaps back;
+- rewind works;
+- tab/window switch pauses video;
+- checkpoint modal appears at configured timestamp and blocks continuation until correct;
+- reinforcement cards remain locked until video completion;
+- completion button remains disabled until all server-visible conditions are satisfied.

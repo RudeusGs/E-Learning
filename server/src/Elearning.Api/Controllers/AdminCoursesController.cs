@@ -19,7 +19,7 @@ public sealed class AdminCoursesController(
     IAdminCourseCommandHandler courseCommands) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<CursorPageResponse<CourseResponse>>> GetCourses(
+    public async Task<ActionResult<CursorPageResponse<AdminCourseListResponse>>> GetCourses(
         int limit = RequestValidation.DefaultLimit,
         string? cursor = null,
         string? search = null,
@@ -31,11 +31,11 @@ public sealed class AdminCoursesController(
             cancellationToken)).ToResponse());
 
     [HttpGet(AdminCourseRoutes.ById)]
-    public async Task<ActionResult<CourseResponse>> GetCourse(long id, CancellationToken cancellationToken) =>
+    public async Task<ActionResult<AdminCourseDetailResponse>> GetCourse(long id, CancellationToken cancellationToken) =>
         Ok((await courseQueries.ExecuteAsync(new GetAdminCourseQuery(id), cancellationToken)).ToResponse());
 
     [HttpPost]
-    public async Task<ActionResult<CourseResponse>> CreateCourse(
+    public async Task<ActionResult<AdminCourseDetailResponse>> CreateCourse(
         CourseWriteRequest request,
         CancellationToken cancellationToken)
     {
@@ -46,7 +46,7 @@ public sealed class AdminCoursesController(
     }
 
     [HttpPut(AdminCourseRoutes.ById)]
-    public async Task<ActionResult<CourseResponse>> UpdateCourse(
+    public async Task<ActionResult<AdminCourseDetailResponse>> UpdateCourse(
         long id,
         CourseWriteRequest request,
         CancellationToken cancellationToken) =>

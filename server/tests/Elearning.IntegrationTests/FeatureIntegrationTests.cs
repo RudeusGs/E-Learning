@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Elearning.Domain;
 using Elearning.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +61,7 @@ public sealed class FeatureIntegrationTests(IntegrationTestFactory factory)
             title = "Secure lesson",
             contentHtml = "<p onclick=\"alert(1)\">Safe</p><script>alert(1)</script><a href=\"javascript:alert(1)\">x</a>",
             videoUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            videoDurationSeconds = 213,
             sortOrder = 1,
             status = "PUBLISHED"
         });
@@ -106,6 +109,10 @@ public sealed class FeatureIntegrationTests(IntegrationTestFactory factory)
         using var client = CreateClient();
         using var login = await client.LoginAsync(scenario.StudentEmail);
         login.EnsureSuccessStatusCode();
+        using var start = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/start",
+            new { });
+        start.EnsureSuccessStatusCode();
 
         using var correct = await client.PostJsonAsync(
             $"/api/student/questions/{scenario.QuestionId}/answer",
@@ -155,6 +162,144 @@ public sealed class FeatureIntegrationTests(IntegrationTestFactory factory)
         Assert.Equal("STUDENT", meJson.RootElement.GetProperty("role").GetString());
     }
 
+    [Fact]
+    public async Task LessonCompletionRequiresStartAndQuizThreshold()
+    {
+        var scenario = await factory.CreateScenarioAsync();
+        using var client = CreateClient();
+        using var login = await client.LoginAsync(scenario.StudentEmail);
+        login.EnsureSuccessStatusCode();
+
+        using var beforeStart = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/complete",
+            new { });
+        Assert.Equal(HttpStatusCode.Conflict, beforeStart.StatusCode);
+        Assert.Equal("LESSON_NOT_STARTED", await beforeStart.GetProblemCodeAsync());
+
+        using var start = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/start",
+            new { });
+        start.EnsureSuccessStatusCode();
+
+        using var beforeQuiz = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/complete",
+            new { });
+        Assert.Equal(HttpStatusCode.Conflict, beforeQuiz.StatusCode);
+        Assert.Equal("QUIZ_NOT_PASSED", await beforeQuiz.GetProblemCodeAsync());
+
+        using var answer = await client.PostJsonAsync(
+            $"/api/student/questions/{scenario.QuestionId}/answer",
+            new { optionId = scenario.CorrectOptionId });
+        answer.EnsureSuccessStatusCode();
+
+        using var completed = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/complete",
+            new { });
+        completed.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task VideoLearningGuardsRejectEarlyCheckpointReinforcementAndCompletion()
+    {
+        var scenario = await factory.CreateScenarioAsync();
+        long checkpointQuestionId;
+        long checkpointCorrectOptionId;
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ElearningDbContext>();
+            var lesson = await dbContext.Lessons.SingleAsync(item => item.Id == scenario.LessonIds[0]);
+            var now = DateTimeOffset.UtcNow;
+            lesson.UpdateDetails(
+                lesson.Title,
+                lesson.Description,
+                lesson.ContentHtml,
+                VideoProvider.Youtube,
+                "dQw4w9WgXcQ",
+                lesson.SortOrder,
+                LessonStatus.Published,
+                now,
+                120);
+
+            var checkpoint = Question.Create(
+                lesson.Id,
+                "Checkpoint before progress",
+                QuestionType.MultipleChoice,
+                "Checkpoint explanation",
+                2,
+                [
+                    new QuestionOptionDraft("Correct", true, 1),
+                    new QuestionOptionDraft("Incorrect", false, 2)
+                ],
+                now,
+                QuestionPlacement.VideoCheckpoint,
+                30);
+            dbContext.Questions.Add(checkpoint);
+            await dbContext.SaveChangesAsync();
+            checkpointQuestionId = checkpoint.Id;
+            checkpointCorrectOptionId = checkpoint.Options.Single(option => option.IsCorrect).Id;
+        }
+
+        using var client = CreateClient();
+        using var login = await client.LoginAsync(scenario.StudentEmail);
+        login.EnsureSuccessStatusCode();
+        using var start = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/start",
+            new { });
+        start.EnsureSuccessStatusCode();
+
+        using var earlyReinforcement = await client.PostJsonAsync(
+            $"/api/student/questions/{scenario.QuestionId}/answer",
+            new { optionId = scenario.CorrectOptionId });
+        Assert.Equal(HttpStatusCode.Conflict, earlyReinforcement.StatusCode);
+        Assert.Equal("VIDEO_NOT_COMPLETED", await earlyReinforcement.GetProblemCodeAsync());
+
+        using var earlyCheckpoint = await client.PostJsonAsync(
+            $"/api/student/questions/{checkpointQuestionId}/answer",
+            new { optionId = checkpointCorrectOptionId });
+        Assert.Equal(HttpStatusCode.Conflict, earlyCheckpoint.StatusCode);
+        Assert.Equal("QUESTION_NOT_AVAILABLE", await earlyCheckpoint.GetProblemCodeAsync());
+
+        using var earlyComplete = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/complete",
+            new { });
+        Assert.Equal(HttpStatusCode.Conflict, earlyComplete.StatusCode);
+        Assert.Equal("VIDEO_NOT_COMPLETED", await earlyComplete.GetProblemCodeAsync());
+    }
+
+    [Fact]
+    public async Task StudentInteractionRateLimitIsPartitionedByAuthenticatedUser()
+    {
+        using var limitedFactory = factory.WithWebHostBuilder(builder =>
+            builder.UseSetting("RateLimiting:StudentInteractionPermitLimit", "1"));
+        using var studentAClient = CreateClient(limitedFactory);
+        using var studentBClient = CreateClient(limitedFactory);
+
+        using var loginA = await studentAClient.LoginAsync(IntegrationTestFactory.StudentAEmail);
+        using var loginB = await studentBClient.LoginAsync(IntegrationTestFactory.StudentBEmail);
+        loginA.EnsureSuccessStatusCode();
+        loginB.EnsureSuccessStatusCode();
+
+        using var startA = await studentAClient.PostJsonAsync(
+            $"/api/student/lessons/{factory.Seed.LessonA1Id}/start",
+            new { });
+        using var startB = await studentBClient.PostJsonAsync(
+            $"/api/student/lessons/{factory.Seed.LessonB1Id}/start",
+            new { });
+        startA.EnsureSuccessStatusCode();
+        startB.EnsureSuccessStatusCode();
+
+        using var answerA = await studentAClient.PostJsonAsync(
+            $"/api/student/questions/{factory.Seed.QuestionAId}/answer",
+            new { optionId = factory.Seed.QuestionACorrectOptionId });
+        using var answerB = await studentBClient.PostJsonAsync(
+            $"/api/student/questions/{factory.Seed.QuestionBId}/answer",
+            new { optionId = factory.Seed.QuestionBCorrectOptionId });
+
+        Assert.Equal(HttpStatusCode.OK, answerA.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, answerB.StatusCode);
+    }
+
     private static async Task<long> CreateCourseAsync(HttpClient client)
     {
         using var response = await client.PostJsonAsync("/api/admin/courses", new
@@ -168,10 +313,13 @@ public sealed class FeatureIntegrationTests(IntegrationTestFactory factory)
         return document.RootElement.GetProperty("id").GetInt64();
     }
 
-    private HttpClient CreateClient() => factory.CreateClient(new WebApplicationFactoryClientOptions
-    {
-        BaseAddress = new Uri("https://localhost"),
-        AllowAutoRedirect = false,
-        HandleCookies = true
-    });
+    private HttpClient CreateClient() => CreateClient(factory);
+
+    private static HttpClient CreateClient(WebApplicationFactory<Program> appFactory) =>
+        appFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost"),
+            AllowAutoRedirect = false,
+            HandleCookies = true
+        });
 }

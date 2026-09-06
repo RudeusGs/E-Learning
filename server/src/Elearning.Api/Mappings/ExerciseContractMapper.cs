@@ -1,3 +1,4 @@
+
 using Elearning.Api.Contracts.Exercises.Responses;
 using Elearning.Application.Exercises;
 using ApiAnswerRequest = Elearning.Api.Contracts.Exercises.Requests.AnswerRequest;
@@ -11,7 +12,8 @@ public static class ExerciseContractMapper
         this IReadOnlyList<AdminQuestionDto> questions) =>
         questions.Select(ToResponse).ToList();
 
-    public static AnswerRequest ToApplication(this ApiAnswerRequest request) => new(request.OptionId);
+    public static AnswerRequest ToApplication(this ApiAnswerRequest request) =>
+        new(request.OptionId);
 
     public static QuestionWriteRequest ToApplication(this ApiQuestionWriteRequest request) =>
         new(
@@ -23,6 +25,8 @@ public static class ExerciseContractMapper
                 option.Content,
                 option.IsCorrect,
                 option.SortOrder)).ToList(),
+            request.Placement,
+            request.VideoTimestampSeconds,
             request.Version);
 
     public static AdminQuestionResponse ToResponse(this AdminQuestionDto question) =>
@@ -31,6 +35,8 @@ public static class ExerciseContractMapper
             question.LessonId,
             question.Text,
             question.Type,
+            question.Placement,
+            question.VideoTimestampSeconds,
             question.Explanation,
             question.SortOrder,
             question.Version,
@@ -48,6 +54,9 @@ public static class ExerciseContractMapper
             question.Id,
             question.Text,
             question.Type,
+            question.Placement,
+            question.VideoTimestampSeconds,
+            question.Passed,
             question.Options.Select(option => new StudentQuestionOptionResponse(
                 option.Id,
                 option.Content)).ToList());

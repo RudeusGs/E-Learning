@@ -11,7 +11,7 @@ public static class CourseContractMapper
     public static Elearning.Application.Courses.CourseWriteRequest ToApplication(this ApiCourseWriteRequest request) =>
         new(request.Title, request.Description, request.ThumbnailUrl, request.Status, request.SortOrder, request.Version);
 
-    public static CourseResponse ToResponse(this CourseDto course) =>
+    public static AdminCourseDetailResponse ToResponse(this AdminCourseDetailDto course) =>
         new(
             course.Id,
             course.Title,
@@ -19,12 +19,17 @@ public static class CourseContractMapper
             course.ThumbnailUrl,
             course.Status,
             course.SortOrder,
-            course.LessonCount,
-            course.StudentCount,
             course.Version);
 
-    public static CursorPageResponse<CourseResponse> ToResponse(this CursorPage<CourseDto> page) =>
-        new(page.Items.Select(ToResponse).ToList(), page.NextCursor, page.HasMore);
+    public static CursorPageResponse<AdminCourseListResponse> ToResponse(this CursorPage<AdminCourseListDto> page) =>
+        new(page.Items.Select(course => new AdminCourseListResponse(
+            course.Id,
+            course.Title,
+            course.Status,
+            course.SortOrder,
+            course.LessonCount,
+            course.StudentCount,
+            course.Version)).ToList(), page.NextCursor, page.HasMore);
 
     public static CursorPageResponse<StudentCourseResponse> ToResponse(this CursorPage<StudentCourseDto> page) =>
         new(

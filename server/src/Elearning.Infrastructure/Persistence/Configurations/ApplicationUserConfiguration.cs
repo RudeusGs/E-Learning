@@ -16,6 +16,14 @@ public sealed class ApplicationUserConfiguration : IEntityTypeConfiguration<Appl
             .IsUnique()
             .HasDatabaseName("EmailIndex")
             .HasFilter("\"NormalizedEmail\" IS NOT NULL");
+        builder.HasIndex(user => user.Status);
+        builder.HasIndex(user => user.FullName)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
+        builder.HasIndex(user => user.Email)
+            .HasDatabaseName("IX_AspNetUsers_Email_Trgm")
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
         builder.ToTable(table => table.HasCheckConstraint(
             "CK_AspNetUsers_Status",
             "\"Status\" IN ('Active', 'Disabled')"));

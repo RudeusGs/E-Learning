@@ -7,7 +7,7 @@ internal static class LessonProgressMapper
 {
     public static LessonProgressDto ToDto(LessonProgress progress) =>
         new(
-            progress.Status.ToString().ToUpperInvariant(),
+            ((LessonProgressStatus?)progress.Status).ToContractValue(),
             progress.StartedAtUtc,
             progress.CompletedAtUtc);
 }

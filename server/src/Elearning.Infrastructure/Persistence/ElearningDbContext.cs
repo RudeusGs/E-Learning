@@ -23,6 +23,7 @@ public sealed class ElearningDbContext(
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.HasPostgresExtension("pg_trgm");
         builder.ApplyConfigurationsFromAssembly(typeof(ElearningDbContext).Assembly);
     }
 

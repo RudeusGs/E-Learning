@@ -5,6 +5,7 @@ using Elearning.Api.Security;
 using Elearning.Application.Exercises;
 using Elearning.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using AnswerRequest = Elearning.Api.Contracts.Exercises.Requests.AnswerRequest;
 
 namespace Elearning.Api.Controllers;
@@ -15,6 +16,7 @@ namespace Elearning.Api.Controllers;
 public sealed class StudentExercisesController(
     ISubmitAnswerCommandHandler submitAnswer) : ControllerBase
 {
+    [EnableRateLimiting(RateLimitPolicyNames.StudentInteraction)]
     [HttpPost(StudentExerciseRoutes.SubmitAnswer)]
     public async Task<ActionResult<AnswerResultResponse>> SubmitAnswer(
         long questionId,

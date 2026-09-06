@@ -1,5 +1,6 @@
 using Elearning.Application.Common;
 using Elearning.Application.Courses;
+using Elearning.Application.Exceptions;
 using Elearning.Domain;
 using Elearning.Infrastructure.Authorization;
 using Elearning.Infrastructure.Persistence;
@@ -8,8 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Courses;
 
 public sealed class StudentCourseCatalogQueryHandler(
-    ElearningDbContext dbContext,
-    ActiveStudentPolicy activeStudentPolicy) : IStudentCourseCatalogQueryHandler
+    ElearningDbContext dbContext) : IStudentCourseCatalogQueryHandler
 {
     public async Task<CursorPage<StudentCourseDto>> ExecuteAsync(
         ListStudentCoursesQuery request,
@@ -17,8 +17,13 @@ public sealed class StudentCourseCatalogQueryHandler(
     {
         var limit = RequestValidation.ValidateLimit(request.Limit);
         var position = CursorCodec.Decode<StudentCourseCursor>(request.Cursor);
-        await activeStudentPolicy.EnsureSatisfiedAsync(request.StudentId, cancellationToken);
-        var rows = await LoadCoursesAsync(request.StudentId, limit, position, cancellationToken);
+        var progress = NormalizeProgressFilter(request.Progress);
+        var rows = await LoadCoursesAsync(
+            request.StudentId,
+            limit,
+            position,
+            progress,
+            cancellationToken);
         return CreatePage(rows, limit);
     }
 
@@ -26,6 +31,7 @@ public sealed class StudentCourseCatalogQueryHandler(
         long studentId,
         int limit,
         StudentCourseCursor? position,
+        string? progress,
         CancellationToken cancellationToken)
     {
         var query = dbContext.Enrollments
@@ -34,6 +40,39 @@ public sealed class StudentCourseCatalogQueryHandler(
                 enrollment.StudentId == studentId &&
                 enrollment.Status == EnrollmentStatus.Active &&
                 enrollment.Course.Status == CourseStatus.Published);
+
+        query = progress switch
+        {
+            StudentCourseProgressFilters.NotStarted => query.Where(enrollment =>
+                !enrollment.Course.Lessons.Any(lesson =>
+                    lesson.Status == LessonStatus.Published &&
+                    lesson.Progress.Any(item =>
+                        item.StudentId == studentId &&
+                        item.Status == LessonProgressStatus.Completed))),
+
+            StudentCourseProgressFilters.Completed => query.Where(enrollment =>
+                enrollment.Course.Lessons.Any(lesson =>
+                    lesson.Status == LessonStatus.Published) &&
+                !enrollment.Course.Lessons.Any(lesson =>
+                    lesson.Status == LessonStatus.Published &&
+                    !lesson.Progress.Any(item =>
+                        item.StudentId == studentId &&
+                        item.Status == LessonProgressStatus.Completed))),
+
+            StudentCourseProgressFilters.InProgress => query.Where(enrollment =>
+                enrollment.Course.Lessons.Any(lesson =>
+                    lesson.Status == LessonStatus.Published &&
+                    lesson.Progress.Any(item =>
+                        item.StudentId == studentId &&
+                        item.Status == LessonProgressStatus.Completed)) &&
+                enrollment.Course.Lessons.Any(lesson =>
+                    lesson.Status == LessonStatus.Published &&
+                    !lesson.Progress.Any(item =>
+                        item.StudentId == studentId &&
+                        item.Status == LessonProgressStatus.Completed))),
+
+            _ => query,
+        };
 
         if (position is not null)
         {
@@ -56,13 +95,35 @@ public sealed class StudentCourseCatalogQueryHandler(
                 enrollment.Course.Lessons.Count(lesson => lesson.Status == LessonStatus.Published),
                 enrollment.Course.Lessons.Count(lesson =>
                     lesson.Status == LessonStatus.Published &&
-                    lesson.Progress.Any(progress =>
-                        progress.StudentId == studentId &&
-                        progress.Status == LessonProgressStatus.Completed))))
+                    lesson.Progress.Any(item =>
+                        item.StudentId == studentId &&
+                        item.Status == LessonProgressStatus.Completed))))
             .ToListAsync(cancellationToken);
     }
 
-    private static CursorPage<StudentCourseDto> CreatePage(List<StudentCourseProjection> rows, int limit)
+    private static string? NormalizeProgressFilter(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = value.Trim().ToUpperInvariant();
+        return normalized switch
+        {
+            StudentCourseProgressFilters.InProgress => normalized,
+            StudentCourseProgressFilters.NotStarted => normalized,
+            StudentCourseProgressFilters.Completed => normalized,
+            _ => throw new RequestValidationException(
+                "Invalid progress filter",
+                $"progress must be one of: {StudentCourseProgressFilters.InProgress}, " +
+                $"{StudentCourseProgressFilters.NotStarted}, {StudentCourseProgressFilters.Completed}."),
+        };
+    }
+
+    private static CursorPage<StudentCourseDto> CreatePage(
+        List<StudentCourseProjection> rows,
+        int limit)
     {
         var hasMore = rows.Count > limit;
         if (hasMore)
@@ -86,6 +147,7 @@ public sealed class StudentCourseCatalogQueryHandler(
         var nextCursor = hasMore && rows.Count > 0
             ? CursorCodec.Encode(new StudentCourseCursor(rows[^1].SortOrder, rows[^1].Id))
             : null;
+
         return new CursorPage<StudentCourseDto>(items, nextCursor, hasMore);
     }
 

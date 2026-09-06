@@ -28,6 +28,7 @@ internal static class FeatureModuleRegistration
         services.AddScoped<IAdminLessonCommandHandler, AdminLessonCommandHandler>();
         services.AddScoped<IStudentLessonQueryHandler, StudentLessonQueryHandler>();
         services.AddScoped<ILessonProgressCommandHandler, LessonProgressCommandHandler>();
+        services.AddScoped<LessonCompletionStateCalculator>();
         services.AddScoped<IAdminQuestionQueryHandler, AdminQuestionQueryHandler>();
         services.AddScoped<IAdminQuestionCommandHandler, AdminQuestionCommandHandler>();
         services.AddScoped<ISubmitAnswerCommandHandler, SubmitAnswerCommandHandler>();
@@ -38,7 +39,6 @@ internal static class FeatureModuleRegistration
         services.AddScoped<IAdminProgressQueryHandler, AdminProgressQueryHandler>();
         services.AddScoped<IStudentProgressQueryHandler, StudentProgressQueryHandler>();
         services.AddScoped<IAdminDashboardQueryHandler, AdminDashboardQueryHandler>();
-        services.AddScoped<ActiveStudentPolicy>();
         services.AddScoped<StudentLessonAccessPolicy>();
         return services;
     }

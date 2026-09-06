@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
@@ -18,6 +19,7 @@ public sealed class HealthEndpointTests : IClassFixture<WebApplicationFactory<Pr
     {
         var factory = _factory.WithWebHostBuilder(builder =>
         {
+            builder.UseEnvironment("Testing");
             builder.UseSetting("Jwt:Key", "integration-only-jwt-signing-key-with-at-least-thirty-two-bytes-2026");
         });
 

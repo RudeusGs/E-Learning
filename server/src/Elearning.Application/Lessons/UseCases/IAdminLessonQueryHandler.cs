@@ -2,7 +2,7 @@ namespace Elearning.Application.Lessons;
 
 public interface IAdminLessonQueryHandler
 {
-    Task<IReadOnlyList<LessonAdminDto>> ExecuteAsync(
+    Task<IReadOnlyList<LessonAdminListDto>> ExecuteAsync(
         ListAdminLessonsQuery query,
         CancellationToken cancellationToken);
 

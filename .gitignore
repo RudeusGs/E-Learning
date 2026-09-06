@@ -40,3 +40,5 @@ npm-debug.log*
 *.tmp
 *.log
 backend_logs.txt
+
+.vs/

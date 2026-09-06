@@ -1,3 +1,4 @@
+
 using Elearning.Application.Exercises;
 using Elearning.Application.Lessons;
 using Elearning.Application.Progress;
@@ -10,7 +11,8 @@ namespace Elearning.Infrastructure.Lessons;
 
 public sealed class StudentLessonQueryHandler(
     ElearningDbContext dbContext,
-    StudentLessonAccessPolicy accessPolicy) : IStudentLessonQueryHandler
+    StudentLessonAccessPolicy accessPolicy,
+    LessonCompletionStateCalculator completionCalculator) : IStudentLessonQueryHandler
 {
     public async Task<StudentLessonDto> ExecuteAsync(
         GetStudentLessonQuery query,
@@ -18,17 +20,51 @@ public sealed class StudentLessonQueryHandler(
     {
         var studentId = query.StudentId;
         var lessonId = query.LessonId;
-        var access = await accessPolicy.AuthorizeAsync(studentId, lessonId, cancellationToken);
-        var lesson = await LoadLessonAsync(lessonId, cancellationToken);
-        var questions = await LoadQuestionsAsync(lessonId, cancellationToken);
-        var progress = await LoadProgressAsync(studentId, lessonId, cancellationToken);
-        var nextLessonId = progress == LessonProgressStatus.Completed
-            ? await FindNextLessonIdAsync(access.CourseId, access.SortOrder, access.LessonId, cancellationToken)
+
+        var access = await accessPolicy.AuthorizeAsync(
+            studentId,
+            lessonId,
+            cancellationToken);
+
+        var lesson = await LoadLessonAsync(
+            studentId,
+            lessonId,
+            cancellationToken);
+
+        var questions = await LoadQuestionsAsync(
+            studentId,
+            lessonId,
+            cancellationToken);
+
+        var completion = await completionCalculator.CalculateAsync(
+            studentId,
+            lessonId,
+            lesson.VideoProvider is not null,
+            lesson.VideoDurationSeconds,
+            lesson.Progress,
+            lesson.VideoCompletedAtUtc,
+            cancellationToken);
+
+        var nextLessonId = lesson.Progress == LessonProgressStatus.Completed
+            ? await FindNextLessonIdAsync(
+                access.CourseId,
+                access.SortOrder,
+                access.LessonId,
+                cancellationToken)
             : null;
-        return CreateResponse(lesson, questions, progress, access.PreviousLessonId, nextLessonId);
+
+        return CreateResponse(
+            lesson,
+            questions,
+            completion,
+            access.PreviousLessonId,
+            nextLessonId);
     }
 
-    private Task<StudentLessonProjection> LoadLessonAsync(long lessonId, CancellationToken cancellationToken) =>
+    private Task<StudentLessonProjection> LoadLessonAsync(
+        long studentId,
+        long lessonId,
+        CancellationToken cancellationToken) =>
         dbContext.Lessons
             .AsNoTracking()
             .Where(candidate => candidate.Id == lessonId)
@@ -39,23 +75,26 @@ public sealed class StudentLessonQueryHandler(
                 candidate.Description,
                 candidate.ContentHtml,
                 candidate.VideoProvider,
-                candidate.VideoExternalId))
+                candidate.VideoExternalId,
+                candidate.VideoDurationSeconds,
+                candidate.Progress
+                    .Where(progress => progress.StudentId == studentId)
+                    .Select(progress => (LessonProgressStatus?)progress.Status)
+                    .SingleOrDefault(),
+                candidate.Progress
+                    .Where(progress => progress.StudentId == studentId)
+                    .Select(progress => (int?)progress.VideoMaxPositionSeconds)
+                    .SingleOrDefault() ?? 0,
+                candidate.Progress
+                    .Where(progress => progress.StudentId == studentId)
+                    .Select(progress => progress.VideoCompletedAtUtc)
+                    .SingleOrDefault()))
             .SingleAsync(cancellationToken);
-
-    private Task<LessonProgressStatus?> LoadProgressAsync(
-        long studentId,
-        long lessonId,
-        CancellationToken cancellationToken) =>
-        dbContext.LessonProgress
-            .AsNoTracking()
-            .Where(candidate => candidate.StudentId == studentId && candidate.LessonId == lessonId)
-            .Select(candidate => (LessonProgressStatus?)candidate.Status)
-            .SingleOrDefaultAsync(cancellationToken);
 
     private static StudentLessonDto CreateResponse(
         StudentLessonProjection lesson,
         IReadOnlyList<StudentQuestionDto> questions,
-        LessonProgressStatus? progress,
+        LessonCompletionStateDto completion,
         long? previousLessonId,
         long? nextLessonId) =>
         new(
@@ -64,15 +103,25 @@ public sealed class StudentLessonQueryHandler(
             lesson.Title,
             lesson.Description,
             lesson.ContentHtml,
-            lesson.VideoProvider is not null && lesson.VideoExternalId is not null
-                ? new VideoDto(lesson.VideoProvider.Value, lesson.VideoExternalId)
+            lesson.VideoProvider is not null &&
+            lesson.VideoExternalId is not null
+                ? new VideoDto(
+                    lesson.VideoProvider.Value,
+                    lesson.VideoExternalId)
                 : null,
-            progress.ToContractValue(),
+            lesson.Progress.ToContractValue(),
+            new VideoProgressDto(
+                lesson.VideoMaxPositionSeconds,
+                lesson.VideoDurationSeconds,
+                lesson.VideoCompletedAtUtc is not null,
+                null),
+            completion,
             previousLessonId,
             nextLessonId,
             questions);
 
     private Task<List<StudentQuestionDto>> LoadQuestionsAsync(
+        long studentId,
         long lessonId,
         CancellationToken cancellationToken) =>
         dbContext.Questions
@@ -84,9 +133,26 @@ public sealed class StudentLessonQueryHandler(
                 question.Id,
                 question.Text,
                 question.Type,
+                question.Placement,
+                question.VideoTimestampSeconds,
+                question.Placement == QuestionPlacement.VideoCheckpoint
+                    ? dbContext.StudentAnswers.Any(answer =>
+                        answer.StudentId == studentId &&
+                        answer.QuestionId == question.Id &&
+                        answer.IsCorrect)
+                    : dbContext.StudentAnswers
+                        .Where(answer =>
+                            answer.StudentId == studentId &&
+                            answer.QuestionId == question.Id)
+                        .OrderByDescending(answer => answer.AnsweredAtUtc)
+                        .ThenByDescending(answer => answer.Id)
+                        .Select(answer => answer.IsCorrect)
+                        .FirstOrDefault(),
                 question.Options
                     .OrderBy(option => option.SortOrder)
-                    .Select(option => new StudentQuestionOptionDto(option.Id, option.Content))
+                    .Select(option => new StudentQuestionOptionDto(
+                        option.Id,
+                        option.Content))
                     .ToList()))
             .ToListAsync(cancellationToken);
 
@@ -101,7 +167,8 @@ public sealed class StudentLessonQueryHandler(
                 candidate.CourseId == courseId &&
                 candidate.Status == LessonStatus.Published &&
                 (candidate.SortOrder > sortOrder ||
-                 (candidate.SortOrder == sortOrder && candidate.Id > lessonId)))
+                 (candidate.SortOrder == sortOrder &&
+                  candidate.Id > lessonId)))
             .OrderBy(candidate => candidate.SortOrder)
             .ThenBy(candidate => candidate.Id)
             .Select(candidate => (long?)candidate.Id)
@@ -114,5 +181,9 @@ public sealed class StudentLessonQueryHandler(
         string? Description,
         string? ContentHtml,
         VideoProvider? VideoProvider,
-        string? VideoExternalId);
+        string? VideoExternalId,
+        int? VideoDurationSeconds,
+        LessonProgressStatus? Progress,
+        int VideoMaxPositionSeconds,
+        DateTimeOffset? VideoCompletedAtUtc);
 }

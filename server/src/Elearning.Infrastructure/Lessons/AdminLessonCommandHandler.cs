@@ -1,3 +1,4 @@
+
 using Elearning.Application.Errors;
 using Elearning.Application.Exceptions;
 using Elearning.Application.Lessons;
@@ -44,7 +45,9 @@ public sealed class AdminLessonCommandHandler(
             video?.ExternalId,
             request.SortOrder,
             request.Status,
-            timeProvider.GetUtcNow());
+            timeProvider.GetUtcNow(),
+            request.VideoDurationSeconds);
+
         dbContext.Lessons.Add(lesson);
         await SaveWithOrderConflictAsync(cancellationToken);
         return LessonMapper.ToAdminDto(lesson);
@@ -66,6 +69,7 @@ public sealed class AdminLessonCommandHandler(
             candidate => candidate.Id == command.LessonId,
             cancellationToken)
             ?? throw new ResourceNotFoundException("Lesson");
+
         if (lesson.Version != request.Version)
         {
             throw new ResourceConcurrencyException("Lesson");
@@ -80,12 +84,16 @@ public sealed class AdminLessonCommandHandler(
             video?.ExternalId,
             request.SortOrder,
             request.Status,
-            timeProvider.GetUtcNow());
+            timeProvider.GetUtcNow(),
+            request.VideoDurationSeconds);
+
         await SaveWithOrderConflictAsync(cancellationToken);
         return LessonMapper.ToAdminDto(lesson);
     }
 
-    public async Task ExecuteAsync(ArchiveLessonCommand command, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(
+        ArchiveLessonCommand command,
+        CancellationToken cancellationToken)
     {
         var lesson = await dbContext.Lessons.SingleOrDefaultAsync(
             candidate => candidate.Id == command.LessonId,
@@ -95,14 +103,18 @@ public sealed class AdminLessonCommandHandler(
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task SaveWithOrderConflictAsync(CancellationToken cancellationToken)
+    private async Task SaveWithOrderConflictAsync(
+        CancellationToken cancellationToken)
     {
         try
         {
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateException exception) when (
-            exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            exception.InnerException is PostgresException
+            {
+                SqlState: PostgresErrorCodes.UniqueViolation
+            })
         {
             throw new ConflictException(
                 ErrorCodes.DuplicateLessonOrder,

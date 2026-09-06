@@ -763,3 +763,24 @@ Nếu thay request/response/error semantics:
 5. Update tài liệu này nếu contract public/stable đổi.
 
 Không silently đổi field name/status code mà chỉ sửa frontend cùng lúc vì sẽ làm bàn giao khó kiểm soát.
+## Learning Guardrails — 2026-08-29
+
+`LessonWriteRequest` adds nullable `videoDurationSeconds`. A Published lesson with video requires a trusted duration.
+
+`QuestionWriteRequest` adds:
+
+- `placement`: `REINFORCEMENT | VIDEO_CHECKPOINT`;
+- `videoTimestampSeconds`: required for `VIDEO_CHECKPOINT`, null for reinforcement.
+
+Student lesson response adds `videoProgress` and `completion` gate state. Student question response adds placement, timestamp and whether the current learner has already passed the question.
+
+New endpoint:
+
+```text
+POST /api/student/lessons/{lessonId}/video-heartbeat
+{ "positionSeconds": 120 }
+```
+
+The response returns the accepted maximum position, trusted duration, video-completed state and an optional blocking checkpoint question id.
+
+`POST /api/student/lessons/{lessonId}/complete` may return 409 with codes including `LESSON_NOT_STARTED`, `VIDEO_DURATION_REQUIRED`, `VIDEO_NOT_COMPLETED`, `CHECKPOINT_REQUIRED`, or `QUIZ_NOT_PASSED`.

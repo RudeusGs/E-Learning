@@ -1,3 +1,4 @@
+
 using Elearning.Domain;
 
 namespace Elearning.Application.Lessons;
@@ -9,6 +10,7 @@ public sealed record LessonAdminDto(
     string? Description,
     string? ContentHtml,
     VideoDto? Video,
+    int? VideoDurationSeconds,
     int SortOrder,
     LessonStatus Status,
     long Version);

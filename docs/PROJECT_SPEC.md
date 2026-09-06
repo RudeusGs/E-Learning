@@ -670,3 +670,17 @@ Các điểm sau là lựa chọn kiến trúc hiện tại, có thể thay đ�
 - Dùng JWT Bearer access token ngắn hạn giữ trong memory; refresh token opaque nằm HttpOnly cookie và rotate server-side.
 
 Nếu thay đổi các assumption này, phải đánh giá migration, API, test và hành vi người dùng trước khi code.
+## Learning Guardrails — 2026-08-29
+
+The previous MVP convention allowing manual lesson completion without a score threshold is superseded.
+
+- Student cannot complete a lesson immediately after opening it.
+- A video lesson requires trusted video duration and server-tracked watch progress.
+- Forward seeking is not accepted as watched progress; tab/window loss of focus pauses the player UX.
+- Admin questions have placement: `REINFORCEMENT` or `VIDEO_CHECKPOINT`.
+- `VIDEO_CHECKPOINT` requires a timestamp and must be answered correctly before video may continue beyond that point.
+- Reinforcement questions are locked until required video completion.
+- Completion requires >80% reinforcement questions passed, plus all video checkpoints passed.
+- Backend completion endpoint is authoritative and revalidates every condition.
+
+See `LEARNING_GUARDRAILS.md`.

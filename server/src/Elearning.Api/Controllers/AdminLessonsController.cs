@@ -17,7 +17,7 @@ public sealed class AdminLessonsController(
     IAdminLessonCommandHandler lessonCommands) : ControllerBase
 {
     [HttpGet(AdminLessonRoutes.CourseLessons)]
-    public async Task<ActionResult<IReadOnlyList<LessonAdminResponse>>> GetLessons(
+    public async Task<ActionResult<IReadOnlyList<LessonAdminListResponse>>> GetLessons(
         long courseId,
         CancellationToken cancellationToken) =>
         Ok((await lessonQueries.ExecuteAsync(

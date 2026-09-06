@@ -1,3 +1,4 @@
+
 using Elearning.Application.Exercises;
 
 namespace Elearning.Application.Lessons;
@@ -10,6 +11,8 @@ public sealed record StudentLessonDto(
     string? ContentHtml,
     VideoDto? Video,
     string ProgressStatus,
+    VideoProgressDto VideoProgress,
+    LessonCompletionStateDto Completion,
     long? PreviousLessonId,
     long? NextLessonId,
     IReadOnlyList<StudentQuestionDto> Questions);

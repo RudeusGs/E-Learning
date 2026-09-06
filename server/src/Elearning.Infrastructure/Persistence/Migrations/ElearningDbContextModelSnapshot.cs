@@ -20,6 +20,7 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Elearning.Domain.Course", b =>
@@ -65,6 +66,11 @@ namespace Elearning.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("SortOrder");
 
+                    b.HasIndex("Title");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("Status", "SortOrder");
 
                     b.ToTable("Courses", null, t =>
@@ -101,6 +107,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId", "Status");
+
+                    b.HasIndex("Status", "Id");
 
                     b.HasIndex("StudentId", "CourseId")
                         .IsUnique();
@@ -154,6 +162,9 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("VideoDurationSeconds")
+                        .HasColumnType("integer");
+
                     b.Property<string>("VideoExternalId")
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
@@ -164,6 +175,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Status");
+
                     b.HasIndex("CourseId", "SortOrder")
                         .IsUnique()
                         .HasFilter("\"Status\" <> 'Archived'");
@@ -173,6 +186,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.ToTable("Lessons", null, t =>
                         {
                             t.HasCheckConstraint("CK_Lessons_Status", "\"Status\" IN ('Draft', 'Published', 'Archived')");
+
+                            t.HasCheckConstraint("CK_Lessons_VideoDuration", "\"VideoDurationSeconds\" IS NULL OR \"VideoDurationSeconds\" BETWEEN 1 AND 43200");
                         });
                 });
 
@@ -208,7 +223,23 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("bigint");
 
+                    b.Property<DateTimeOffset?>("VideoCompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("VideoHeartbeatAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("VideoLastPositionSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VideoMaxPositionSeconds")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Status");
 
                     b.HasIndex("LessonId", "Status");
 
@@ -220,6 +251,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.ToTable("LessonProgress", null, t =>
                         {
                             t.HasCheckConstraint("CK_LessonProgress_Status", "\"Status\" IN ('InProgress', 'Completed')");
+
+                            t.HasCheckConstraint("CK_LessonProgress_VideoPosition", "\"VideoMaxPositionSeconds\" >= 0 AND (\"VideoLastPositionSeconds\" IS NULL OR \"VideoLastPositionSeconds\" >= 0)");
                         });
                 });
 
@@ -241,6 +274,11 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.Property<long>("LessonId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Placement")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
@@ -260,14 +298,23 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("VideoTimestampSeconds")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId", "SortOrder")
                         .IsUnique();
 
+                    b.HasIndex("LessonId", "Placement", "VideoTimestampSeconds");
+
                     b.ToTable("Questions", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Questions_Placement", "\"Placement\" IN ('Reinforcement', 'VideoCheckpoint')");
+
                             t.HasCheckConstraint("CK_Questions_Type", "\"Type\" IN ('MultipleChoice', 'TrueFalse')");
+
+                            t.HasCheckConstraint("CK_Questions_VideoTimestamp", "(\"Placement\" = 'Reinforcement' AND \"VideoTimestampSeconds\" IS NULL) OR (\"Placement\" = 'VideoCheckpoint' AND \"VideoTimestampSeconds\" >= 1)");
                         });
                 });
 
@@ -336,6 +383,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.HasIndex("QuestionId", "OptionId");
 
                     b.HasIndex("StudentId", "QuestionId", "AnsweredAtUtc");
+
+                    b.HasIndex("StudentId", "QuestionId", "IsCorrect");
 
                     b.ToTable("StudentAnswers", (string)null);
                 });
@@ -413,6 +462,17 @@ namespace Elearning.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .HasDatabaseName("IX_AspNetUsers_Email_Trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Email"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Email"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("FullName");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("FullName"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("FullName"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("NormalizedEmail")
                         .IsUnique()
                         .HasDatabaseName("EmailIndex")
@@ -421,6 +481,8 @@ namespace Elearning.Infrastructure.Persistence.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("Status");
 
                     b.ToTable("AspNetUsers", null, t =>
                         {

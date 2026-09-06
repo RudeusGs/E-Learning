@@ -4,6 +4,12 @@ public static class ErrorCodes
 {
     public const string AccountDisabled = "ACCOUNT_DISABLED";
     public const string ConcurrencyConflict = "CONCURRENCY_CONFLICT";
+    public const string CheckpointRequired = "CHECKPOINT_REQUIRED";
+    public const string LessonNotStarted = "LESSON_NOT_STARTED";
+    public const string QuestionNotAvailable = "QUESTION_NOT_AVAILABLE";
+    public const string QuizNotPassed = "QUIZ_NOT_PASSED";
+    public const string VideoDurationRequired = "VIDEO_DURATION_REQUIRED";
+    public const string VideoNotCompleted = "VIDEO_NOT_COMPLETED";
     public const string CourseArchived = "COURSE_ARCHIVED";
     public const string DuplicateLessonOrder = "DUPLICATE_LESSON_ORDER";
     public const string Forbidden = "FORBIDDEN";

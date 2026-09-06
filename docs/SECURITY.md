@@ -450,3 +450,6 @@ Phải review lại `SECURITY.md` nếu thêm:
 - Mobile app/token auth.
 
 Không copy security design hiện tại sang feature mới nếu trust boundary thay đổi.
+## Learning interaction abuse controls — 2026-08-29
+
+Video heartbeat and answer-submit endpoints use the `student-interaction` fixed-window limiter partitioned by authenticated user id (default 120 requests/minute). This is an abuse ceiling, not the primary anti-skip mechanism; trusted video advancement is still capped by server elapsed time and checkpoint state.

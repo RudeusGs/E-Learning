@@ -9,52 +9,45 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Courses;
 
 public sealed class StudentCourseDetailQueryHandler(
-    ElearningDbContext dbContext,
-    ActiveStudentPolicy activeStudentPolicy) : IStudentCourseDetailQueryHandler
+    ElearningDbContext dbContext) : IStudentCourseDetailQueryHandler
 {
     public async Task<StudentCourseDetailDto> ExecuteAsync(
         GetStudentCourseQuery query,
         CancellationToken cancellationToken)
     {
-        await activeStudentPolicy.EnsureSatisfiedAsync(query.StudentId, cancellationToken);
-        var course = await LoadCourseAsync(query.StudentId, query.CourseId, cancellationToken);
-        var lessons = await LoadLessonsAsync(query.StudentId, query.CourseId, cancellationToken);
-        return CreateResponse(course, lessons);
+        var projection = await LoadCourseAndLessonsAsync(query.StudentId, query.CourseId, cancellationToken);
+        return CreateResponse(projection.Course, projection.Lessons);
     }
 
-    private async Task<CourseProjection> LoadCourseAsync(
+    private async Task<CourseDetailProjection> LoadCourseAndLessonsAsync(
         long studentId,
         long courseId,
         CancellationToken cancellationToken) =>
-        await dbContext.Courses
+        // Assumption: Courses are naturally bounded by curriculum design to a reasonable number of lessons (e.g., < 200).
+        // Returning all summary projections at once avoids complex pagination of sequential lock state.
+        await dbContext.Enrollments
             .AsNoTracking()
-            .Where(candidate =>
-                candidate.Id == courseId &&
-                candidate.Status == CourseStatus.Published &&
-                candidate.Enrollments.Any(enrollment =>
-                    enrollment.StudentId == studentId &&
-                    enrollment.Status == EnrollmentStatus.Active))
-            .Select(candidate => new CourseProjection(candidate.Id, candidate.Title, candidate.Description))
+            .Where(enrollment =>
+                enrollment.StudentId == studentId &&
+                enrollment.CourseId == courseId &&
+                enrollment.Status == EnrollmentStatus.Active &&
+                enrollment.Course.Status == CourseStatus.Published)
+            .Select(enrollment => new CourseDetailProjection(
+                new CourseProjection(enrollment.Course.Id, enrollment.Course.Title, enrollment.Course.Description),
+                enrollment.Course.Lessons
+                    .Where(lesson => lesson.Status == LessonStatus.Published)
+                    .OrderBy(lesson => lesson.SortOrder)
+                    .ThenBy(lesson => lesson.Id)
+                    .Select(lesson => new LessonProjection(
+                        lesson.Id,
+                        lesson.Title,
+                        lesson.SortOrder,
+                        lesson.Progress.Any(progress =>
+                            progress.StudentId == studentId &&
+                            progress.Status == LessonProgressStatus.Completed)))
+                    .ToList()))
             .SingleOrDefaultAsync(cancellationToken)
             ?? throw new ResourceNotFoundException("Course");
-
-    private Task<List<LessonProjection>> LoadLessonsAsync(
-        long studentId,
-        long courseId,
-        CancellationToken cancellationToken) =>
-        dbContext.Lessons
-            .AsNoTracking()
-            .Where(lesson => lesson.CourseId == courseId && lesson.Status == LessonStatus.Published)
-            .OrderBy(lesson => lesson.SortOrder)
-            .ThenBy(lesson => lesson.Id)
-            .Select(lesson => new LessonProjection(
-                lesson.Id,
-                lesson.Title,
-                lesson.SortOrder,
-                lesson.Progress.Any(progress =>
-                    progress.StudentId == studentId &&
-                    progress.Status == LessonProgressStatus.Completed)))
-            .ToListAsync(cancellationToken);
 
     private static StudentCourseDetailDto CreateResponse(
         CourseProjection course,
@@ -86,4 +79,5 @@ public sealed class StudentCourseDetailQueryHandler(
 
     private sealed record CourseProjection(long Id, string Title, string? Description);
     private sealed record LessonProjection(long Id, string Title, int SortOrder, bool Completed);
+    private sealed record CourseDetailProjection(CourseProjection Course, IReadOnlyList<LessonProjection> Lessons);
 }

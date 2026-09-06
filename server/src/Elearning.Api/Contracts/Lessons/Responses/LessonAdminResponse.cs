@@ -1,3 +1,4 @@
+
 using Elearning.Domain;
 
 namespace Elearning.Api.Contracts.Lessons.Responses;
@@ -9,6 +10,7 @@ public sealed record LessonAdminResponse(
     string? Description,
     string? ContentHtml,
     VideoResponse? Video,
+    int? VideoDurationSeconds,
     int SortOrder,
     LessonStatus Status,
     long Version);

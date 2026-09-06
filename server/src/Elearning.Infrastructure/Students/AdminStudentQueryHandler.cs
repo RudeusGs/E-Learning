@@ -18,14 +18,20 @@ public sealed class AdminStudentQueryHandler(
         var limit = RequestValidation.ValidateLimit(request.Limit);
         var search = RequestValidation.NormalizeSearch(request.Search);
         var position = CursorCodec.Decode<StudentCursor>(request.Cursor);
-        var query = BuildListQuery(position, search);
+        var query = BuildListQuery(position, search, request.Status);
         var items = await LoadListItemsAsync(query, limit, cancellationToken);
         return CreatePage(items, limit);
     }
 
-    public async Task<StudentDetailDto> ExecuteAsync(GetStudentQuery query, CancellationToken cancellationToken)
+    public async Task<StudentDetailDto> ExecuteAsync(
+        GetStudentQuery query,
+        CancellationToken cancellationToken)
     {
-        var student = await students.FindAsync(query.StudentId, tracked: false, cancellationToken);
+        var student = await students.FindAsync(
+            query.StudentId,
+            tracked: false,
+            cancellationToken);
+
         var enrollments = await dbContext.Enrollments
             .AsNoTracking()
             .Where(enrollment => enrollment.StudentId == query.StudentId)
@@ -36,22 +42,35 @@ public sealed class AdminStudentQueryHandler(
                 enrollment.Course.Title,
                 enrollment.Status))
             .ToListAsync(cancellationToken);
+
         return StudentMapper.ToDetail(student, enrollments);
     }
 
-    private IQueryable<ApplicationUser> BuildListQuery(StudentCursor? position, string? search)
+    private IQueryable<ApplicationUser> BuildListQuery(
+        StudentCursor? position,
+        string? search,
+        AccountStatus? status)
     {
         var query = students.Query(tracked: false);
+
         if (position is not null)
         {
             query = query.Where(user => user.Id > position.Value.Id);
         }
 
-        return search is null
-            ? query
-            : query.Where(user =>
+        if (search is not null)
+        {
+            query = query.Where(user =>
                 EF.Functions.ILike(user.FullName, $"%{search}%") ||
                 (user.Email != null && EF.Functions.ILike(user.Email, $"%{search}%")));
+        }
+
+        if (status is not null)
+        {
+            query = query.Where(user => user.Status == status);
+        }
+
+        return query;
     }
 
     private async Task<List<StudentListItemDto>> LoadListItemsAsync(
@@ -66,11 +85,14 @@ public sealed class AdminStudentQueryHandler(
                 user.FullName,
                 user.Email ?? string.Empty,
                 dbContext.Enrollments.Count(enrollment =>
-                    enrollment.StudentId == user.Id && enrollment.Status == EnrollmentStatus.Active),
+                    enrollment.StudentId == user.Id &&
+                    enrollment.Status == EnrollmentStatus.Active),
                 user.Status))
             .ToListAsync(cancellationToken);
 
-    private static CursorPage<StudentListItemDto> CreatePage(List<StudentListItemDto> items, int limit)
+    private static CursorPage<StudentListItemDto> CreatePage(
+        List<StudentListItemDto> items,
+        int limit)
     {
         var hasMore = items.Count > limit;
         if (hasMore)
@@ -81,6 +103,7 @@ public sealed class AdminStudentQueryHandler(
         var nextCursor = hasMore && items.Count > 0
             ? CursorCodec.Encode(new StudentCursor(items[^1].Id))
             : null;
+
         return new CursorPage<StudentListItemDto>(items, nextCursor, hasMore);
     }
 

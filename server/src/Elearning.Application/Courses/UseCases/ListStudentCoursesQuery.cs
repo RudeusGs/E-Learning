@@ -1,3 +1,7 @@
 namespace Elearning.Application.Courses;
 
-public sealed record ListStudentCoursesQuery(long StudentId, int Limit, string? Cursor);
+public sealed record ListStudentCoursesQuery(
+    long StudentId,
+    int Limit,
+    string? Cursor,
+    string? Progress);

@@ -1,6 +1,7 @@
 using DotNetEnv;
 using Elearning.Api.Extensions;
 using Elearning.Infrastructure;
+using Elearning.Infrastructure.Persistence;
 
 Env.TraversePath().Load();
 
@@ -11,6 +12,7 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
+await app.Services.InitializeDatabaseAsync(app.Environment, app.Configuration);
 app.UseApiPipeline();
 app.Run();
 

@@ -68,8 +68,8 @@ public static class ApplicationBuilderExtensions
     private static void ConfigureSecurityMiddleware(WebApplication app)
     {
         app.UseHttpsRedirection();
-        app.UseRateLimiter();
         app.UseAuthentication();
+        app.UseRateLimiter();
         app.UseAuthorization();
     }
 

@@ -1,3 +1,4 @@
+
 using Elearning.Domain;
 
 namespace Elearning.Application.Lessons;
@@ -9,4 +10,5 @@ public sealed record LessonWriteRequest(
     string? VideoUrl,
     int SortOrder,
     LessonStatus Status,
+    int? VideoDurationSeconds = null,
     long? Version = null);

@@ -98,6 +98,10 @@ public sealed class PersistenceIntegrationTests(IntegrationTestFactory factory)
             $"/api/student/lessons/{scenario.LessonIds[0]}/start",
             new { });
         start.EnsureSuccessStatusCode();
+        using var passForCompletion = await client.PostJsonAsync(
+            $"/api/student/questions/{scenario.QuestionId}/answer",
+            new { optionId = scenario.CorrectOptionId });
+        passForCompletion.EnsureSuccessStatusCode();
         var path = $"/api/student/lessons/{scenario.LessonIds[0]}/complete";
 
         var responses = await Task.WhenAll(

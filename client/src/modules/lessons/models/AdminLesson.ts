@@ -9,6 +9,7 @@ export interface AdminLesson {
   description: string | null
   contentHtml: string | null
   video: VideoReference | null
+  videoDurationSeconds: number | null
   sortOrder: number
   status: LessonStatus
   version: number

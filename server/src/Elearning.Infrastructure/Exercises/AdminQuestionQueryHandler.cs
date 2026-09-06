@@ -1,3 +1,4 @@
+
 using Elearning.Application.Exceptions;
 using Elearning.Application.Exercises;
 using Elearning.Infrastructure.Persistence;
@@ -5,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elearning.Infrastructure.Exercises;
 
-public sealed class AdminQuestionQueryHandler(ElearningDbContext dbContext) : IAdminQuestionQueryHandler
+public sealed class AdminQuestionQueryHandler(
+    ElearningDbContext dbContext) : IAdminQuestionQueryHandler
 {
     public async Task<IReadOnlyList<AdminQuestionDto>> ExecuteAsync(
         ListAdminQuestionsQuery query,
@@ -28,6 +30,8 @@ public sealed class AdminQuestionQueryHandler(ElearningDbContext dbContext) : IA
                 question.LessonId,
                 question.Text,
                 question.Type,
+                question.Placement,
+                question.VideoTimestampSeconds,
                 question.Explanation,
                 question.SortOrder,
                 question.Version,

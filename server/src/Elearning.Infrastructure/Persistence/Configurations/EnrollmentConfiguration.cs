@@ -25,5 +25,6 @@ public sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollmen
         builder.HasIndex(enrollment => new { enrollment.StudentId, enrollment.CourseId }).IsUnique();
         builder.HasIndex(enrollment => new { enrollment.CourseId, enrollment.Status });
         builder.HasIndex(enrollment => new { enrollment.StudentId, enrollment.Status });
+        builder.HasIndex(enrollment => new { enrollment.Status, enrollment.Id });
     }
 }

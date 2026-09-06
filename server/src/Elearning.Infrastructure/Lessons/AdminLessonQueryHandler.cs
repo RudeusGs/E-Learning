@@ -7,7 +7,7 @@ namespace Elearning.Infrastructure.Lessons;
 
 public sealed class AdminLessonQueryHandler(ElearningDbContext dbContext) : IAdminLessonQueryHandler
 {
-    public async Task<IReadOnlyList<LessonAdminDto>> ExecuteAsync(
+    public async Task<IReadOnlyList<LessonAdminListDto>> ExecuteAsync(
         ListAdminLessonsQuery query,
         CancellationToken cancellationToken)
     {
@@ -23,15 +23,11 @@ public sealed class AdminLessonQueryHandler(ElearningDbContext dbContext) : IAdm
             .Where(lesson => lesson.CourseId == query.CourseId)
             .OrderBy(lesson => lesson.SortOrder)
             .ThenBy(lesson => lesson.Id)
-            .Select(lesson => new LessonAdminDto(
+            .Select(lesson => new LessonAdminListDto(
                 lesson.Id,
                 lesson.CourseId,
                 lesson.Title,
                 lesson.Description,
-                lesson.ContentHtml,
-                lesson.VideoProvider != null && lesson.VideoExternalId != null
-                    ? new VideoDto(lesson.VideoProvider.Value, lesson.VideoExternalId)
-                    : null,
                 lesson.SortOrder,
                 lesson.Status,
                 lesson.Version))

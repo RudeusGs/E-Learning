@@ -11,7 +11,7 @@ public sealed class AdminCourseCommandHandler(
     ElearningDbContext dbContext,
     TimeProvider timeProvider) : IAdminCourseCommandHandler
 {
-    public async Task<CourseDto> ExecuteAsync(
+    public async Task<AdminCourseDetailDto> ExecuteAsync(
         CreateCourseCommand command,
         CancellationToken cancellationToken)
     {
@@ -26,10 +26,10 @@ public sealed class AdminCourseCommandHandler(
 
         dbContext.Courses.Add(course);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return CourseMapper.ToDto(course);
+        return CourseMapper.ToDetailDto(course);
     }
 
-    public async Task<CourseDto> ExecuteAsync(
+    public async Task<AdminCourseDetailDto> ExecuteAsync(
         UpdateCourseCommand command,
         CancellationToken cancellationToken)
     {
@@ -58,7 +58,7 @@ public sealed class AdminCourseCommandHandler(
             request.Status,
             timeProvider.GetUtcNow());
         await dbContext.SaveChangesAsync(cancellationToken);
-        return CourseMapper.ToDto(course);
+        return CourseMapper.ToDetailDto(course);
     }
 
     public async Task ExecuteAsync(ArchiveCourseCommand command, CancellationToken cancellationToken)

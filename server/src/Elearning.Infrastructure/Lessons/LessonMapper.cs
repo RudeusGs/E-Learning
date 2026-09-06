@@ -1,3 +1,4 @@
+
 using Elearning.Application.Lessons;
 using Elearning.Domain;
 
@@ -13,8 +14,11 @@ internal static class LessonMapper
             lesson.Description,
             lesson.ContentHtml,
             lesson.VideoProvider is not null && lesson.VideoExternalId is not null
-                ? new VideoDto(lesson.VideoProvider.Value, lesson.VideoExternalId)
+                ? new VideoDto(
+                    lesson.VideoProvider.Value,
+                    lesson.VideoExternalId)
                 : null,
+            lesson.VideoDurationSeconds,
             lesson.SortOrder,
             lesson.Status,
             lesson.Version);

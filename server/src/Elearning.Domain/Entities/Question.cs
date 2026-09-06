@@ -1,3 +1,4 @@
+
 namespace Elearning.Domain;
 
 public sealed class Question
@@ -12,6 +13,8 @@ public sealed class Question
     public long LessonId { get; private set; }
     public string Text { get; private set; } = string.Empty;
     public QuestionType Type { get; private set; }
+    public QuestionPlacement Placement { get; private set; } = QuestionPlacement.Reinforcement;
+    public int? VideoTimestampSeconds { get; private set; }
     public string? Explanation { get; private set; }
     public int SortOrder { get; private set; }
     public long Version { get; private set; } = 1;
@@ -27,7 +30,9 @@ public sealed class Question
         string? explanation,
         int sortOrder,
         IReadOnlyCollection<QuestionOptionDraft> options,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        QuestionPlacement placement = QuestionPlacement.Reinforcement,
+        int? videoTimestampSeconds = null)
     {
         if (lessonId <= 0)
         {
@@ -41,7 +46,15 @@ public sealed class Question
             UpdatedAtUtc = now
         };
 
-        question.Update(text, type, explanation, sortOrder, options, now);
+        question.Update(
+            text,
+            type,
+            explanation,
+            sortOrder,
+            options,
+            now,
+            placement,
+            videoTimestampSeconds);
         return question;
     }
 
@@ -51,11 +64,18 @@ public sealed class Question
         string? explanation,
         int sortOrder,
         IReadOnlyCollection<QuestionOptionDraft> options,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        QuestionPlacement placement = QuestionPlacement.Reinforcement,
+        int? videoTimestampSeconds = null)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             throw new DomainValidationException("Nội dung câu hỏi là bắt buộc.");
+        }
+
+        if (text.Trim().Length > 2000)
+        {
+            throw new DomainValidationException("Nội dung câu hỏi không được vượt quá 2000 ký tự.");
         }
 
         if (sortOrder < 0)
@@ -63,10 +83,13 @@ public sealed class Question
             throw new DomainValidationException("Thứ tự sắp xếp câu hỏi không được là số âm.");
         }
 
+        ValidatePlacement(placement, videoTimestampSeconds);
         ValidateOptions(type, options);
 
         Text = text.Trim();
         Type = type;
+        Placement = placement;
+        VideoTimestampSeconds = videoTimestampSeconds;
         Explanation = string.IsNullOrWhiteSpace(explanation) ? null : explanation.Trim();
         SortOrder = sortOrder;
         UpdatedAtUtc = now;
@@ -74,7 +97,31 @@ public sealed class Question
         _options.AddRange(options.OrderBy(option => option.SortOrder).Select(QuestionOption.Create));
     }
 
-    private static void ValidateOptions(QuestionType type, IReadOnlyCollection<QuestionOptionDraft> options)
+    private static void ValidatePlacement(
+        QuestionPlacement placement,
+        int? videoTimestampSeconds)
+    {
+        if (placement == QuestionPlacement.Reinforcement)
+        {
+            if (videoTimestampSeconds is not null)
+            {
+                throw new DomainValidationException(
+                    "Câu hỏi củng cố cuối bài không được có mốc thời gian video.");
+            }
+
+            return;
+        }
+
+        if (videoTimestampSeconds is null or < 1)
+        {
+            throw new DomainValidationException(
+                "Câu hỏi trong video phải có mốc thời gian từ 1 giây trở lên.");
+        }
+    }
+
+    private static void ValidateOptions(
+        QuestionType type,
+        IReadOnlyCollection<QuestionOptionDraft> options)
     {
         if (options.Count(option => option.IsCorrect) != 1)
         {
@@ -93,12 +140,12 @@ public sealed class Question
 
         if (type == QuestionType.MultipleChoice && options.Count is < 2 or > 4)
         {
-            throw new DomainValidationException("Câu hỏi trắc nghiệm phải có từ hai đến bốn lựa chọn.");
+            throw new DomainValidationException("Câu hỏi nhiều lựa chọn phải có từ 2 đến 4 lựa chọn.");
         }
 
         if (type == QuestionType.TrueFalse && options.Count != 2)
         {
-            throw new DomainValidationException("Câu hỏi đúng/sai phải có chính xác hai lựa chọn.");
+            throw new DomainValidationException("Câu hỏi Đúng/Sai phải có đúng 2 lựa chọn.");
         }
     }
 }

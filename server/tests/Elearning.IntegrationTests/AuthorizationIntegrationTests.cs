@@ -101,6 +101,15 @@ public sealed class AuthorizationIntegrationTests(IntegrationTestFactory factory
         using var login = await client.LoginAsync(scenario.StudentEmail);
         login.EnsureSuccessStatusCode();
 
+        using var startForCompletion = await client.PostJsonAsync(
+            $"/api/student/lessons/{scenario.LessonIds[0]}/start",
+            new { });
+        startForCompletion.EnsureSuccessStatusCode();
+        using var passForCompletion = await client.PostJsonAsync(
+            $"/api/student/questions/{scenario.QuestionId}/answer",
+            new { optionId = scenario.CorrectOptionId });
+        passForCompletion.EnsureSuccessStatusCode();
+
         using var complete = await client.PostJsonAsync(
             $"/api/student/lessons/{scenario.LessonIds[0]}/complete",
             new { });

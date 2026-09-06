@@ -9,7 +9,7 @@ namespace Elearning.Infrastructure.Courses;
 
 public sealed class AdminCourseQueryHandler(ElearningDbContext dbContext) : IAdminCourseQueryHandler
 {
-    public async Task<CursorPage<CourseDto>> ExecuteAsync(
+    public async Task<CursorPage<AdminCourseListDto>> ExecuteAsync(
         ListAdminCoursesQuery request,
         CancellationToken cancellationToken)
     {
@@ -82,17 +82,15 @@ public sealed class AdminCourseQueryHandler(ElearningDbContext dbContext) : IAdm
             : query.OrderByDescending(course => course.SortOrder).ThenByDescending(course => course.Id);
     }
 
-    private static Task<List<CourseDto>> LoadPageAsync(
+    private static Task<List<AdminCourseListDto>> LoadPageAsync(
         IQueryable<Course> query,
         int limit,
         CancellationToken cancellationToken) =>
         query
             .Take(limit + 1)
-            .Select(course => new CourseDto(
+            .Select(course => new AdminCourseListDto(
                 course.Id,
                 course.Title,
-                course.Description,
-                course.ThumbnailUrl,
                 course.Status,
                 course.SortOrder,
                 course.Lessons.Count(lesson => lesson.Status != LessonStatus.Archived),
@@ -100,7 +98,7 @@ public sealed class AdminCourseQueryHandler(ElearningDbContext dbContext) : IAdm
                 course.Version))
             .ToListAsync(cancellationToken);
 
-    private static CursorPage<CourseDto> CreatePage(List<CourseDto> items, CourseListRequest request)
+    private static CursorPage<AdminCourseListDto> CreatePage(List<AdminCourseListDto> items, CourseListRequest request)
     {
         var hasMore = items.Count > request.Limit;
         if (hasMore)
@@ -111,22 +109,20 @@ public sealed class AdminCourseQueryHandler(ElearningDbContext dbContext) : IAdm
         var nextCursor = hasMore && items.Count > 0
             ? CursorCodec.Encode(new CourseListCursor(request.Sort, items[^1].SortOrder, items[^1].Id))
             : null;
-        return new CursorPage<CourseDto>(items, nextCursor, hasMore);
+        return new CursorPage<AdminCourseListDto>(items, nextCursor, hasMore);
     }
 
-    public async Task<CourseDto> ExecuteAsync(GetAdminCourseQuery query, CancellationToken cancellationToken) =>
+    public async Task<AdminCourseDetailDto> ExecuteAsync(GetAdminCourseQuery query, CancellationToken cancellationToken) =>
         await dbContext.Courses
             .AsNoTracking()
             .Where(course => course.Id == query.CourseId)
-            .Select(course => new CourseDto(
+            .Select(course => new AdminCourseDetailDto(
                 course.Id,
                 course.Title,
                 course.Description,
                 course.ThumbnailUrl,
                 course.Status,
                 course.SortOrder,
-                course.Lessons.Count(lesson => lesson.Status != LessonStatus.Archived),
-                course.Enrollments.Count(enrollment => enrollment.Status == EnrollmentStatus.Active),
                 course.Version))
             .SingleOrDefaultAsync(cancellationToken)
         ?? throw new ResourceNotFoundException("Course");

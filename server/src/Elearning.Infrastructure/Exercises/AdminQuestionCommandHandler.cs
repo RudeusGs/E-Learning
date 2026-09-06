@@ -1,3 +1,4 @@
+
 using Elearning.Application.Errors;
 using Elearning.Application.Exceptions;
 using Elearning.Application.Exercises;
@@ -17,12 +18,10 @@ public sealed class AdminQuestionCommandHandler(
         CancellationToken cancellationToken)
     {
         var request = command.Question;
-        if (!await dbContext.Lessons.AsNoTracking().AnyAsync(
-                lesson => lesson.Id == command.LessonId,
-                cancellationToken))
-        {
-            throw new ResourceNotFoundException("Lesson");
-        }
+        await ValidatePlacementAsync(
+            command.LessonId,
+            request,
+            cancellationToken);
 
         var question = Question.Create(
             command.LessonId,
@@ -31,7 +30,9 @@ public sealed class AdminQuestionCommandHandler(
             request.Explanation,
             request.SortOrder,
             QuestionMapper.ToDrafts(request),
-            timeProvider.GetUtcNow());
+            timeProvider.GetUtcNow(),
+            request.Placement,
+            request.VideoTimestampSeconds);
         dbContext.Questions.Add(question);
         await SaveWithConflictMappingAsync(cancellationToken);
         return QuestionMapper.ToAdminDto(question);
@@ -51,8 +52,11 @@ public sealed class AdminQuestionCommandHandler(
 
         var question = await dbContext.Questions
             .Include(candidate => candidate.Options)
-            .SingleOrDefaultAsync(candidate => candidate.Id == command.QuestionId, cancellationToken)
+            .SingleOrDefaultAsync(
+                candidate => candidate.Id == command.QuestionId,
+                cancellationToken)
             ?? throw new ResourceNotFoundException("Question");
+
         if (question.Version != request.Version)
         {
             throw new ResourceConcurrencyException("Question");
@@ -66,23 +70,35 @@ public sealed class AdminQuestionCommandHandler(
                 "Create a replacement question instead of changing a question with historical attempts.");
         }
 
+        await ValidatePlacementAsync(
+            question.LessonId,
+            request,
+            cancellationToken);
+
         question.Update(
             request.Text,
             request.Type,
             request.Explanation,
             request.SortOrder,
             QuestionMapper.ToDrafts(request),
-            timeProvider.GetUtcNow());
+            timeProvider.GetUtcNow(),
+            request.Placement,
+            request.VideoTimestampSeconds);
         await SaveWithConflictMappingAsync(cancellationToken);
         return QuestionMapper.ToAdminDto(question);
     }
 
-    public async Task ExecuteAsync(DeleteQuestionCommand command, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(
+        DeleteQuestionCommand command,
+        CancellationToken cancellationToken)
     {
         var question = await dbContext.Questions
             .Include(candidate => candidate.Options)
-            .SingleOrDefaultAsync(candidate => candidate.Id == command.QuestionId, cancellationToken)
+            .SingleOrDefaultAsync(
+                candidate => candidate.Id == command.QuestionId,
+                cancellationToken)
             ?? throw new ResourceNotFoundException("Question");
+
         if (await HasAnswerHistoryAsync(command.QuestionId, cancellationToken))
         {
             throw new ConflictException(
@@ -95,19 +111,72 @@ public sealed class AdminQuestionCommandHandler(
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private Task<bool> HasAnswerHistoryAsync(long questionId, CancellationToken cancellationToken) =>
+    private async Task ValidatePlacementAsync(
+        long lessonId,
+        QuestionWriteRequest request,
+        CancellationToken cancellationToken)
+    {
+        var lesson = await dbContext.Lessons
+            .AsNoTracking()
+            .Where(candidate => candidate.Id == lessonId)
+            .Select(candidate => new
+            {
+                candidate.VideoProvider,
+                candidate.VideoDurationSeconds
+            })
+            .SingleOrDefaultAsync(cancellationToken)
+            ?? throw new ResourceNotFoundException("Lesson");
+
+        if (request.Placement != QuestionPlacement.VideoCheckpoint)
+        {
+            return;
+        }
+
+        if (lesson.VideoProvider is null)
+        {
+            throw new RequestValidationException(
+                "Checkpoint question requires a video",
+                "Choose reinforcement placement or add a video to the lesson.");
+        }
+
+        if (lesson.VideoDurationSeconds is null)
+        {
+            throw new RequestValidationException(
+                ErrorCodes.VideoDurationRequired,
+                "Video duration is required",
+                "Configure the lesson video duration before adding in-video checkpoints.");
+        }
+
+        if (
+            request.VideoTimestampSeconds is null ||
+            request.VideoTimestampSeconds < 1 ||
+            request.VideoTimestampSeconds >= lesson.VideoDurationSeconds)
+        {
+            throw new RequestValidationException(
+                "Invalid checkpoint timestamp",
+                $"Checkpoint time must be between 1 and {lesson.VideoDurationSeconds.Value - 1} seconds.");
+        }
+    }
+
+    private Task<bool> HasAnswerHistoryAsync(
+        long questionId,
+        CancellationToken cancellationToken) =>
         dbContext.StudentAnswers.AsNoTracking().AnyAsync(
             answer => answer.QuestionId == questionId,
             cancellationToken);
 
-    private async Task SaveWithConflictMappingAsync(CancellationToken cancellationToken)
+    private async Task SaveWithConflictMappingAsync(
+        CancellationToken cancellationToken)
     {
         try
         {
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateException exception) when (
-            exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            exception.InnerException is PostgresException
+            {
+                SqlState: PostgresErrorCodes.UniqueViolation
+            })
         {
             throw new ConflictException(
                 ErrorCodes.QuestionOrderConflict,
