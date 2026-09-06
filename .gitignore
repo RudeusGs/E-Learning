@@ -42,3 +42,4 @@ npm-debug.log*
 backend_logs.txt
 
 .vs/
+repomix-output.xml
