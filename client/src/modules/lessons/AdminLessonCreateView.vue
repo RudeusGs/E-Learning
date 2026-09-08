@@ -78,9 +78,7 @@ const titleValid = computed(() => {
 
 const descriptionValid = computed(() => form.description.length <= 4000)
 
-const sortOrderValid = computed(
-  () => Number.isInteger(form.sortOrder) && form.sortOrder >= 0,
-)
+const sortOrderValid = computed(() => Number.isInteger(form.sortOrder) && form.sortOrder >= 0)
 
 const orderConflict = computed(() =>
   nonArchivedLessons.value.some((lesson) => lesson.sortOrder === form.sortOrder),
@@ -93,7 +91,11 @@ const videoUrlValid = computed(() => {
 
 const videoDurationValid = computed(() => {
   if (!form.videoUrl.trim()) return form.videoDurationSeconds === null
-  return Number.isInteger(form.videoDurationSeconds) && (form.videoDurationSeconds ?? 0) > 0 && (form.videoDurationSeconds ?? 0) <= 43200
+  return (
+    Number.isInteger(form.videoDurationSeconds) &&
+    (form.videoDurationSeconds ?? 0) > 0 &&
+    (form.videoDurationSeconds ?? 0) <= 43200
+  )
 })
 
 const formValid = computed(
@@ -164,18 +166,13 @@ function parseYouTubeId(value: string): string | null {
     let id: string | null = null
 
     if (host === 'youtu.be') {
-      id = url.pathname
-        .split('/')
-        .filter(Boolean)[0] ?? null
+      id = url.pathname.split('/').filter(Boolean)[0] ?? null
     } else if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'm.youtube.com') {
       if (url.pathname.toLowerCase() === '/watch') {
         id = url.searchParams.get('v')
       } else {
         const segments = url.pathname.split('/').filter(Boolean)
-        if (
-          segments.length === 2 &&
-          (segments[0] === 'embed' || segments[0] === 'shorts')
-        ) {
+        if (segments.length === 2 && (segments[0] === 'embed' || segments[0] === 'shorts')) {
           id = segments[1] ?? null
         }
       }
@@ -196,8 +193,7 @@ function loadVideoPreview(): void {
 
   const id = parseYouTubeId(value)
   if (!id) {
-    previewProblem.value =
-      'Chỉ hỗ trợ URL YouTube HTTPS dạng watch, youtu.be, embed hoặc shorts.'
+    previewProblem.value = 'Chỉ hỗ trợ URL YouTube HTTPS dạng watch, youtu.be, embed hoặc shorts.'
     return
   }
 
@@ -433,7 +429,8 @@ onMounted(load)
             </h1>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-[#6b5d5c] sm:text-[15px]">
               Thêm thông tin, video và nội dung chi tiết cho bài học thuộc
-              <strong class="font-bold text-[#4b403f]">{{ course.title }}</strong>.
+              <strong class="font-bold text-[#4b403f]">{{ course.title }}</strong
+              >.
             </p>
           </div>
         </header>
@@ -448,11 +445,15 @@ onMounted(load)
                 Tạo khung trước, hoàn thiện kiểm tra sau
               </h2>
               <p class="mt-1 text-xs leading-5 text-[#81716f]">
-                1. Nhập nội dung → 2. Thêm video + thời lượng nếu có → 3. Lưu bài → 4. Sang Câu hỏi & kiểm tra để tạo checkpoint và bài củng cố.
+                1. Nhập nội dung → 2. Thêm video + thời lượng nếu có → 3. Lưu bài → 4. Sang Câu hỏi
+                & kiểm tra để tạo checkpoint và bài củng cố.
               </p>
             </div>
-            <div class="rounded-lg border border-[#efd1a7] bg-[#fff8ed] px-3 py-2 text-[10px] font-semibold leading-4 text-[#7b5521] lg:max-w-[310px]">
-              Chưa chắc nội dung đã xong? Hãy lưu <strong>Bản nháp</strong>. Học viên chỉ thấy lesson khi bạn chủ động xuất bản.
+            <div
+              class="rounded-lg border border-[#efd1a7] bg-[#fff8ed] px-3 py-2 text-[10px] font-semibold leading-4 text-[#7b5521] lg:max-w-[310px]"
+            >
+              Chưa chắc nội dung đã xong? Hãy lưu <strong>Bản nháp</strong>. Học viên chỉ thấy
+              lesson khi bạn chủ động xuất bản.
             </div>
           </div>
         </section>
@@ -523,7 +524,9 @@ onMounted(load)
                       <span>Mô tả ngắn</span>
                       <span
                         class="text-[11px] font-semibold"
-                        :class="form.description.length > 4000 ? 'text-[#ba1a1a]' : 'text-[#a0918f]'"
+                        :class="
+                          form.description.length > 4000 ? 'text-[#ba1a1a]' : 'text-[#a0918f]'
+                        "
                       >
                         {{ form.description.length }}/4000
                       </span>
@@ -667,10 +670,7 @@ onMounted(load)
                     </button>
                   </div>
 
-                  <p
-                    v-if="previewProblem"
-                    class="mt-2 text-xs leading-5 text-[#ba1a1a]"
-                  >
+                  <p v-if="previewProblem" class="mt-2 text-xs leading-5 text-[#ba1a1a]">
                     {{ previewProblem }}
                   </p>
                   <p v-else class="mt-2 text-xs leading-5 text-[#8d7c7a]">
@@ -679,9 +679,14 @@ onMounted(load)
                 </label>
 
                 <div v-if="form.videoUrl.trim()" class="mt-4 block max-w-sm">
-                  <span class="mb-2 block text-xs font-bold text-[#403735]">Thời lượng video tin cậy</span>
+                  <span class="mb-2 block text-xs font-bold text-[#403735]"
+                    >Thời lượng video tin cậy</span
+                  >
                   <DurationInput v-model="form.videoDurationSeconds" />
-                  <p class="mt-1.5 text-[11px] leading-5 text-[#8d7c7a]">Dùng để chống tua và xác nhận đã xem hết video. Video Published bắt buộc có giá trị này.</p>
+                  <p class="mt-1.5 text-[11px] leading-5 text-[#8d7c7a]">
+                    Dùng để chống tua và xác nhận đã xem hết video. Video Published bắt buộc có giá
+                    trị này.
+                  </p>
                 </div>
 
                 <div
@@ -755,20 +760,10 @@ onMounted(load)
                   class="flex flex-wrap items-center gap-1 border-b border-[#e8e0df] bg-[#faf8f7] px-3 py-2.5 sm:px-5"
                   aria-label="Công cụ định dạng"
                 >
-                  <button
-                    type="button"
-                    class="editor-tool"
-                    title="Tiêu đề"
-                    @click="setBlock('h3')"
-                  >
+                  <button type="button" class="editor-tool" title="Tiêu đề" @click="setBlock('h3')">
                     H3
                   </button>
-                  <button
-                    type="button"
-                    class="editor-tool"
-                    title="Đoạn văn"
-                    @click="setBlock('p')"
-                  >
+                  <button type="button" class="editor-tool" title="Đoạn văn" @click="setBlock('p')">
                     P
                   </button>
                   <span class="mx-1 h-5 w-px bg-[#ded5d4]" />
@@ -809,12 +804,7 @@ onMounted(load)
                   </button>
                   <span class="mx-1 h-5 w-px bg-[#ded5d4]" />
 
-                  <button
-                    type="button"
-                    class="editor-tool"
-                    title="Liên kết"
-                    @click="insertLink"
-                  >
+                  <button type="button" class="editor-tool" title="Liên kết" @click="insertLink">
                     Link
                   </button>
                   <button
@@ -862,8 +852,8 @@ onMounted(load)
                       <path d="M12 10.5V17M12 7h.01" />
                     </svg>
                     <p>
-                      Khi dán nội dung, editor chỉ nhận văn bản thuần để tránh mang theo HTML không mong muốn.
-                      Link chỉ cho phép HTTPS hoặc mailto.
+                      Khi dán nội dung, editor chỉ nhận văn bản thuần để tránh mang theo HTML không
+                      mong muốn. Link chỉ cho phép HTTPS hoặc mailto.
                     </p>
                   </div>
                 </div>
@@ -914,9 +904,7 @@ onMounted(load)
                     <p class="text-xs font-black uppercase tracking-[0.12em] text-[#7d6d6b]">
                       Cấu trúc hiện tại
                     </p>
-                    <span class="text-[10px] font-bold text-[#a08f8d]">
-                      Theo thứ tự
-                    </span>
+                    <span class="text-[10px] font-bold text-[#a08f8d]"> Theo thứ tự </span>
                   </div>
 
                   <div class="relative mt-4 space-y-4">
@@ -967,10 +955,7 @@ onMounted(load)
                         >
                           {{ statusLabel(item.status) }}
                         </span>
-                        <span
-                          v-else
-                          class="mt-0.5 block text-[10px] font-bold text-[#c9152b]"
-                        >
+                        <span v-else class="mt-0.5 block text-[10px] font-bold text-[#c9152b]">
                           Đang tạo
                         </span>
                       </div>
@@ -979,9 +964,7 @@ onMounted(load)
                 </div>
               </section>
 
-              <section
-                class="rounded-2xl border border-[#eadfdf] bg-[#f7f3f2] p-5"
-              >
+              <section class="rounded-2xl border border-[#eadfdf] bg-[#f7f3f2] p-5">
                 <p class="text-xs font-black text-[#4d4240]">Trước khi tạo bài học</p>
                 <ul class="mt-3 space-y-2.5 text-xs leading-5 text-[#756765]">
                   <li class="flex gap-2">
@@ -994,7 +977,8 @@ onMounted(load)
                   </li>
                   <li class="flex gap-2">
                     <span class="mt-2 size-1.5 shrink-0 rounded-full bg-[#c9152b]" />
-                    Nếu xuất bản ngay, bài học sẽ tham gia learning path của học viên khi course hợp lệ.
+                    Nếu xuất bản ngay, bài học sẽ tham gia learning path của học viên khi course hợp
+                    lệ.
                   </li>
                 </ul>
               </section>
@@ -1031,8 +1015,20 @@ onMounted(load)
                     fill="none"
                     aria-hidden="true"
                   >
-                    <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <circle
+                      class="opacity-30"
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M21 12a9 9 0 0 0-9-9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
                   </svg>
                   {{ savingAction === 'draft' ? 'Đang lưu…' : 'Lưu bản nháp' }}
                 </button>
@@ -1049,8 +1045,20 @@ onMounted(load)
                     fill="none"
                     aria-hidden="true"
                   >
-                    <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <circle
+                      class="opacity-30"
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M21 12a9 9 0 0 0-9-9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
                   </svg>
 
                   <svg

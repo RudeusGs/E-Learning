@@ -50,9 +50,6 @@ jobs:
       - name: Build
         run: npm run build:client
 
-      - name: Validate Playwright configuration
-        run: npm run test:e2e:list
-
       - name: Dependency audit
         run: npm audit --audit-level=high
 

@@ -130,7 +130,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="flex h-[calc(100vh-88px)] flex-col gap-4 overflow-hidden sm:h-[calc(100vh-96px)] lg:gap-6">
+  <section
+    class="flex h-[calc(100vh-88px)] flex-col gap-4 overflow-hidden sm:h-[calc(100vh-96px)] lg:gap-6"
+  >
     <header
       class="relative shrink-0 overflow-hidden rounded-2xl border border-[#eadfdf] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(38,20,20,0.02)] sm:px-8 sm:py-6"
     >
@@ -192,7 +194,9 @@ onBeforeUnmount(() => {
     <section aria-labelledby="dashboard-metrics-title" class="shrink-0">
       <div class="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">Số liệu hệ thống</p>
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">
+            Số liệu hệ thống
+          </p>
           <h2 id="dashboard-metrics-title" class="mt-1 text-xl font-black tracking-[-0.02em]">
             Tổng quan
           </h2>
@@ -231,14 +235,18 @@ onBeforeUnmount(() => {
           class="group relative overflow-hidden rounded-2xl border border-[#e8e3e3] bg-white p-4 transition duration-200 hover:-translate-y-0.5 hover:border-[#e1c5c8] hover:shadow-[0_10px_30px_rgba(84,31,39,0.06)] sm:p-5"
         >
           <div class="absolute inset-y-0 left-0 w-1 bg-[#c9152b]" />
-          <div class="metric-dots pointer-events-none absolute -right-5 -top-5 size-24 opacity-45" />
+          <div
+            class="metric-dots pointer-events-none absolute -right-5 -top-5 size-24 opacity-45"
+          />
 
           <div class="relative z-10 flex items-start justify-between gap-4">
             <div>
               <p class="text-[11px] font-bold uppercase tracking-[0.12em] text-[#806f6e]">
                 {{ metric.label }}
               </p>
-              <p class="mt-3 text-[36px] font-black leading-none tracking-[-0.035em] text-[#1c1b1b]">
+              <p
+                class="mt-3 text-[36px] font-black leading-none tracking-[-0.035em] text-[#1c1b1b]"
+              >
                 {{ formatNumber(metric.value) }}
               </p>
             </div>
@@ -300,7 +308,6 @@ onBeforeUnmount(() => {
               </svg>
             </span>
           </div>
-
         </article>
       </div>
     </section>

@@ -79,10 +79,7 @@ const isCourseCompleted = computed(
     progress.value!.completedLessons >= progress.value!.totalLessons,
 )
 
-function normalizeStatus(
-  status: string | undefined,
-  state: string,
-): LessonProgressStatus {
+function normalizeStatus(status: string | undefined, state: string): LessonProgressStatus {
   if (status === 'COMPLETED' || state === 'COMPLETED') return 'COMPLETED'
   if (status === 'IN_PROGRESS') return 'IN_PROGRESS'
   return 'NOT_STARTED'
@@ -247,9 +244,7 @@ watch(
               {{ course.title }}
             </h1>
 
-            <p
-              class="mt-3 max-w-3xl text-sm leading-6 text-[#6b5d5c] sm:text-[15px]"
-            >
+            <p class="mt-3 max-w-3xl text-sm leading-6 text-[#6b5d5c] sm:text-[15px]">
               {{
                 course.description ||
                 'Theo dõi quá trình hoàn thành các bài học Published trong khóa học.'
@@ -318,9 +313,7 @@ watch(
               >
                 <span class="size-1.5 rounded-full bg-current" />
                 {{
-                  currentLesson.status === 'IN_PROGRESS'
-                    ? '1 đang học'
-                    : 'Bài kế tiếp đã sẵn sàng'
+                  currentLesson.status === 'IN_PROGRESS' ? '1 đang học' : 'Bài kế tiếp đã sẵn sàng'
                 }}
               </span>
 
@@ -347,7 +340,8 @@ watch(
                 Lộ trình học tập
               </h2>
               <p class="mt-2 text-sm leading-6 text-[#81716f]">
-                Trạng thái và thời điểm bên dưới được lấy trực tiếp từ tiến độ của tài khoản hiện tại.
+                Trạng thái và thời điểm bên dưới được lấy trực tiếp từ tiến độ của tài khoản hiện
+                tại.
               </p>
             </div>
 
@@ -356,11 +350,7 @@ watch(
               :to="`/student/learn/${currentLesson.id}`"
               class="inline-flex h-10 shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-[#c9152b] px-4 text-sm font-bold text-white shadow-[0_6px_16px_rgba(160,0,28,0.11)] transition hover:bg-[#a0001c] sm:self-auto"
             >
-              {{
-                currentLesson.status === 'IN_PROGRESS'
-                  ? 'Tiếp tục học'
-                  : 'Học bài tiếp theo'
-              }}
+              {{ currentLesson.status === 'IN_PROGRESS' ? 'Tiếp tục học' : 'Học bài tiếp theo' }}
               <svg
                 class="size-4"
                 viewBox="0 0 24 24"
@@ -395,9 +385,7 @@ watch(
               </svg>
             </div>
 
-            <h3 class="mt-4 text-lg font-black text-[#403735]">
-              Chưa có bài học Published
-            </h3>
+            <h3 class="mt-4 text-lg font-black text-[#403735]">Chưa có bài học Published</h3>
             <p class="mt-2 max-w-md text-sm leading-6 text-[#81716f]">
               Tiến độ sẽ được tính khi khóa học có bài học đang ở trạng thái Published.
             </p>
@@ -482,11 +470,7 @@ watch(
                     <div class="flex flex-wrap items-center gap-2">
                       <span
                         class="text-[10px] font-black uppercase tracking-[0.13em]"
-                        :class="
-                          item.id === currentLesson?.id
-                            ? 'text-[#a0001c]'
-                            : 'text-[#9a8987]'
-                        "
+                        :class="item.id === currentLesson?.id ? 'text-[#a0001c]' : 'text-[#9a8987]'"
                       >
                         Bài {{ index + 1 }}
                       </span>
@@ -574,13 +558,9 @@ watch(
                         Bắt đầu {{ formatDate(item.startedAtUtc) }}
                       </span>
 
-                      <span v-else-if="!item.canAccess">
-                        Hoàn thành bài trước để mở khóa
-                      </span>
+                      <span v-else-if="!item.canAccess"> Hoàn thành bài trước để mở khóa </span>
 
-                      <span v-else>
-                        Chưa có lịch sử bắt đầu
-                      </span>
+                      <span v-else> Chưa có lịch sử bắt đầu </span>
                     </div>
                   </div>
 

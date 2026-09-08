@@ -69,9 +69,7 @@ const activeCourseIds = computed(
 
 const availableCourses = computed(() =>
   courses.value.filter(
-    (course) =>
-      course.status !== 'ARCHIVED' &&
-      !activeCourseIds.value.has(course.id),
+    (course) => course.status !== 'ARCHIVED' && !activeCourseIds.value.has(course.id),
   ),
 )
 
@@ -84,9 +82,7 @@ const selectedExistingEnrollment = computed(() => {
 
   return (
     student.value.enrollments.find(
-      (item) =>
-        item.courseId === selectedCourse.value?.id &&
-        item.status === 'INACTIVE',
+      (item) => item.courseId === selectedCourse.value?.id && item.status === 'INACTIVE',
     ) ?? null
   )
 })
@@ -170,10 +166,7 @@ async function loadStudent(): Promise<void> {
     student.value = data
     fullName.value = data.fullName
 
-    await Promise.all([
-      loadProgress(),
-      loadCourses(),
-    ])
+    await Promise.all([loadProgress(), loadCourses()])
   } catch (error) {
     problem.value = toProblem(error)
   } finally {
@@ -187,12 +180,7 @@ async function loadProgress(): Promise<void> {
   let hasMore = true
 
   while (hasMore) {
-    const page = await progressApi.getAdminProgress(
-      cursor,
-      undefined,
-      studentId.value,
-      undefined,
-    )
+    const page = await progressApi.getAdminProgress(cursor, undefined, studentId.value, undefined)
 
     items.push(...page.items)
     cursor = page.nextCursor
@@ -211,12 +199,7 @@ async function loadCourses(): Promise<void> {
   courseProblem.value = null
 
   try {
-    const page = await courseApi.getAdminCourses(
-      null,
-      courseSearch.value.trim(),
-      signal,
-      20,
-    )
+    const page = await courseApi.getAdminCourses(null, courseSearch.value.trim(), signal, 20)
 
     if (signal.aborted) return
 
@@ -261,7 +244,6 @@ function clearCourseSearch(): void {
   void loadCourses()
 }
 
-
 function openAssignPanel(): void {
   if (!student.value || student.value.status === 'DISABLED') return
 
@@ -285,12 +267,7 @@ function handleAssignPanelKeydown(event: KeyboardEvent): void {
 }
 
 async function saveProfile(): Promise<void> {
-  if (
-    !student.value ||
-    savingProfile.value ||
-    !nameValid.value ||
-    !hasNameChange.value
-  ) {
+  if (!student.value || savingProfile.value || !nameValid.value || !hasNameChange.value) {
     return
   }
 
@@ -299,10 +276,7 @@ async function saveProfile(): Promise<void> {
   successMessage.value = ''
 
   try {
-    const updated = await studentApi.updateStudent(
-      student.value.id,
-      fullName.value.trim(),
-    )
+    const updated = await studentApi.updateStudent(student.value.id, fullName.value.trim())
 
     student.value = updated
     fullName.value = updated.fullName
@@ -316,11 +290,7 @@ async function saveProfile(): Promise<void> {
 }
 
 async function disableStudent(): Promise<void> {
-  if (
-    !student.value ||
-    student.value.status === 'DISABLED' ||
-    disabling.value
-  ) {
+  if (!student.value || student.value.status === 'DISABLED' || disabling.value) {
     return
   }
 
@@ -529,7 +499,9 @@ onBeforeUnmount(() => {
                   </span>
                 </div>
 
-                <div class="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#756765]">
+                <div
+                  class="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#756765]"
+                >
                   <span class="inline-flex min-w-0 items-center gap-2">
                     <svg
                       class="size-4.5 shrink-0 text-[#9b8987]"
@@ -544,7 +516,6 @@ onBeforeUnmount(() => {
                     </svg>
                     <span class="truncate">{{ student.email }}</span>
                   </span>
-
 
                   <span class="text-xs font-semibold text-[#9a8987]">
                     {{ activeEnrollments.length }} khóa đang gán
@@ -683,20 +654,30 @@ onBeforeUnmount(() => {
                     fill="none"
                     aria-hidden="true"
                   >
-                    <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <circle
+                      class="opacity-30"
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M21 12a9 9 0 0 0-9-9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
                   </svg>
                   {{ savingProfile ? 'Đang lưu…' : 'Lưu thay đổi' }}
                 </button>
               </form>
 
-              <div
-                v-if="student.status === 'ACTIVE'"
-                class="mt-6 border-t border-[#eee7e6] pt-5"
-              >
+              <div v-if="student.status === 'ACTIVE'" class="mt-6 border-t border-[#eee7e6] pt-5">
                 <p class="text-xs font-black text-[#9d1d2a]">Quản lý tài khoản</p>
                 <p class="mt-1.5 text-xs leading-5 text-[#81716f]">
-                  Vô hiệu hóa sẽ chặn đăng nhập và thu hồi phiên hiện tại. Contract quản trị hiện chưa có thao tác kích hoạt lại.
+                  Vô hiệu hóa sẽ chặn đăng nhập và thu hồi phiên hiện tại. Contract quản trị hiện
+                  chưa có thao tác kích hoạt lại.
                 </p>
 
                 <button
@@ -720,7 +701,6 @@ onBeforeUnmount(() => {
                 </button>
               </div>
             </section>
-
           </div>
 
           <!-- Assigned courses -->
@@ -742,7 +722,14 @@ onBeforeUnmount(() => {
                   class="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#c9152b] px-3.5 text-xs font-bold text-white transition hover:bg-[#a0001c] disabled:cursor-not-allowed disabled:bg-[#d8cfce] disabled:text-[#817775]"
                   @click="openAssignPanel"
                 >
-                  <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <svg
+                    class="size-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                   Gán khóa học
@@ -828,10 +815,7 @@ onBeforeUnmount(() => {
                     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                       <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2.5">
-                          <RouterLink
-                            :to="`/admin/courses/${enrollment.courseId}`"
-                            class="min-w-0"
-                          >
+                          <RouterLink :to="`/admin/courses/${enrollment.courseId}`" class="min-w-0">
                             <h3
                               class="truncate text-base font-black tracking-[-0.015em] text-[#302929] transition hover:text-[#a0001c] sm:text-[17px]"
                             >
@@ -850,8 +834,6 @@ onBeforeUnmount(() => {
                             {{ enrollmentStatusLabel(enrollment.status) }}
                           </span>
                         </div>
-
-
                       </div>
 
                       <div class="flex shrink-0 items-center gap-2">
@@ -968,12 +950,19 @@ onBeforeUnmount(() => {
               aria-modal="true"
               aria-labelledby="assign-course-title"
             >
-              <header class="flex shrink-0 items-start justify-between gap-4 border-b border-[#eee7e6] px-5 py-5 sm:px-6">
+              <header
+                class="flex shrink-0 items-start justify-between gap-4 border-b border-[#eee7e6] px-5 py-5 sm:px-6"
+              >
                 <div class="min-w-0">
-                  <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-[#fff1f2] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#a0001c]">
+                  <div
+                    class="mb-2 inline-flex items-center gap-2 rounded-full bg-[#fff1f2] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#a0001c]"
+                  >
                     {{ activeEnrollments.length }} khóa đang gán
                   </div>
-                  <h2 id="assign-course-title" class="text-xl font-black tracking-[-0.025em] text-[#302929]">
+                  <h2
+                    id="assign-course-title"
+                    class="text-xl font-black tracking-[-0.025em] text-[#302929]"
+                  >
                     Gán khóa học
                   </h2>
                   <p class="mt-1 text-xs leading-5 text-[#81716f]">
@@ -988,7 +977,14 @@ onBeforeUnmount(() => {
                   class="grid size-10 shrink-0 place-items-center rounded-xl border border-[#e4dcdb] text-[#776967] transition hover:bg-[#f7f3f2] hover:text-[#a0001c] disabled:opacity-50"
                   @click="closeAssignPanel"
                 >
-                  <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <svg
+                    class="size-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
                     <path d="M6 6l12 12M18 6 6 18" />
                   </svg>
                 </button>
@@ -996,8 +992,17 @@ onBeforeUnmount(() => {
 
               <div class="flex min-h-0 flex-1 flex-col px-5 py-5 sm:px-6">
                 <div class="relative shrink-0">
-                  <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]">
-                    <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]"
+                  >
+                    <svg
+                      class="size-4.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
                       <circle cx="11" cy="11" r="7" />
                       <path d="m20 20-4-4" />
                     </svg>
@@ -1019,7 +1024,14 @@ onBeforeUnmount(() => {
                     class="absolute inset-y-0 right-0 grid w-10 place-items-center text-[#9a8886] hover:text-[#7f1020]"
                     @click="clearCourseSearch"
                   >
-                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg
+                      class="size-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
                       <path d="M6 6l12 12M18 6 6 18" />
                     </svg>
                   </button>
@@ -1035,26 +1047,47 @@ onBeforeUnmount(() => {
                   </p>
                 </div>
 
-                <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#e3dad9] bg-[#faf8f7]">
+                <div
+                  class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#e3dad9] bg-[#faf8f7]"
+                >
                   <div v-if="courseLoading" class="space-y-2 p-3">
-                    <div v-for="index in 6" :key="index" class="h-[72px] animate-pulse rounded-xl bg-[#eee8e7]" />
+                    <div
+                      v-for="index in 6"
+                      :key="index"
+                      class="h-[72px] animate-pulse rounded-xl bg-[#eee8e7]"
+                    />
                   </div>
 
                   <div
                     v-else-if="availableCourses.length === 0"
                     class="flex min-h-[260px] flex-col items-center justify-center px-6 text-center"
                   >
-                    <div class="grid size-11 place-items-center rounded-xl bg-white text-[#a48f8d] shadow-sm">
-                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                    <div
+                      class="grid size-11 place-items-center rounded-xl bg-white text-[#a48f8d] shadow-sm"
+                    >
+                      <svg
+                        class="size-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
                         <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
                         <path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20" />
                       </svg>
                     </div>
                     <p class="mt-3 text-sm font-bold text-[#5b4e4c]">
-                      {{ courseSearch ? 'Không tìm thấy khóa học' : 'Không có khóa học có thể gán' }}
+                      {{
+                        courseSearch ? 'Không tìm thấy khóa học' : 'Không có khóa học có thể gán'
+                      }}
                     </p>
                     <p class="mt-1 max-w-xs text-xs leading-5 text-[#8d7c7a]">
-                      {{ courseSearch ? 'Thử từ khóa ngắn hơn hoặc xóa tìm kiếm.' : 'Các khóa học khả dụng đã được gán hoặc đã lưu trữ.' }}
+                      {{
+                        courseSearch
+                          ? 'Thử từ khóa ngắn hơn hoặc xóa tìm kiếm.'
+                          : 'Các khóa học khả dụng đã được gán hoặc đã lưu trữ.'
+                      }}
                     </p>
                   </div>
 
@@ -1063,7 +1096,11 @@ onBeforeUnmount(() => {
                     v-else
                     :key="courseItem.id"
                     class="group flex cursor-pointer items-start gap-3 border-b border-[#ece5e4] px-4 py-3.5 last:border-0 hover:bg-white"
-                    :class="selectedCourseId === courseItem.id ? 'bg-white ring-1 ring-inset ring-[#e7b7bc]' : ''"
+                    :class="
+                      selectedCourseId === courseItem.id
+                        ? 'bg-white ring-1 ring-inset ring-[#e7b7bc]'
+                        : ''
+                    "
                   >
                     <input
                       v-model="selectedCourseId"
@@ -1074,11 +1111,20 @@ onBeforeUnmount(() => {
                     />
 
                     <span class="min-w-0 flex-1">
-                      <span class="block text-sm font-bold leading-5 text-[#403735]">{{ courseItem.title }}</span>
-                      <span class="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] font-semibold text-[#958582]">
+                      <span class="block text-sm font-bold leading-5 text-[#403735]">{{
+                        courseItem.title
+                      }}</span>
+                      <span
+                        class="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] font-semibold text-[#958582]"
+                      >
                         <span>{{ courseStatusLabel(courseItem.status) }}</span>
                         <span
-                          v-if="student.enrollments.some((item) => item.courseId === courseItem.id && item.status === 'INACTIVE')"
+                          v-if="
+                            student.enrollments.some(
+                              (item) =>
+                                item.courseId === courseItem.id && item.status === 'INACTIVE',
+                            )
+                          "
                           class="rounded-md bg-[#fff3e7] px-1.5 py-0.5 font-bold text-[#a66315]"
                         >
                           Đã từng gán
@@ -1088,9 +1134,20 @@ onBeforeUnmount(() => {
 
                     <span
                       class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full border transition"
-                      :class="selectedCourseId === courseItem.id ? 'border-[#c9152b] bg-[#c9152b] text-white' : 'border-[#ddd3d2] bg-white text-transparent group-hover:border-[#d2a5aa]'"
+                      :class="
+                        selectedCourseId === courseItem.id
+                          ? 'border-[#c9152b] bg-[#c9152b] text-white'
+                          : 'border-[#ddd3d2] bg-white text-transparent group-hover:border-[#d2a5aa]'
+                      "
                     >
-                      <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                      <svg
+                        class="size-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.4"
+                        aria-hidden="true"
+                      >
                         <path d="m6 12 4 4 8-8" />
                       </svg>
                     </span>
@@ -1100,8 +1157,12 @@ onBeforeUnmount(() => {
 
               <footer class="shrink-0 border-t border-[#eee7e6] bg-white px-5 py-4 sm:px-6">
                 <div v-if="selectedCourse" class="mb-3 rounded-xl bg-[#f8f5f4] px-3.5 py-3">
-                  <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#9a8987]">Đã chọn</p>
-                  <p class="mt-1 line-clamp-2 text-xs font-bold leading-5 text-[#403735]">{{ selectedCourse.title }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-[0.12em] text-[#9a8987]">
+                    Đã chọn
+                  </p>
+                  <p class="mt-1 line-clamp-2 text-xs font-bold leading-5 text-[#403735]">
+                    {{ selectedCourse.title }}
+                  </p>
                 </div>
 
                 <div class="flex gap-2.5">
@@ -1120,11 +1181,35 @@ onBeforeUnmount(() => {
                     class="inline-flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-xl bg-[#c9152b] px-4 text-sm font-bold text-white shadow-[0_6px_16px_rgba(160,0,28,0.12)] transition hover:bg-[#a0001c] disabled:cursor-not-allowed disabled:bg-[#d8cfce] disabled:text-[#817775] disabled:shadow-none"
                     @click="enrollSelectedCourse"
                   >
-                    <svg v-if="enrolling" class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <svg
+                      v-if="enrolling"
+                      class="size-4 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        class="opacity-30"
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke="currentColor"
+                        stroke-width="3"
+                      />
+                      <path
+                        d="M21 12a9 9 0 0 0-9-9"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                      />
                     </svg>
-                    {{ enrolling ? 'Đang xử lý…' : selectedExistingEnrollment ? 'Gán lại khóa học' : 'Gán khóa học' }}
+                    {{
+                      enrolling
+                        ? 'Đang xử lý…'
+                        : selectedExistingEnrollment
+                          ? 'Gán lại khóa học'
+                          : 'Gán khóa học'
+                    }}
                   </button>
                 </div>
               </footer>

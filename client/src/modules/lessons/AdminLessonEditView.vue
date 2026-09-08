@@ -69,9 +69,7 @@ const titleValid = computed(() => {
 
 const descriptionValid = computed(() => form.description.length <= 4000)
 
-const sortOrderValid = computed(
-  () => Number.isInteger(form.sortOrder) && form.sortOrder >= 0,
-)
+const sortOrderValid = computed(() => Number.isInteger(form.sortOrder) && form.sortOrder >= 0)
 
 const orderConflict = computed(() =>
   courseLessons.value.some(
@@ -89,7 +87,11 @@ const videoUrlValid = computed(() => {
 
 const videoDurationValid = computed(() => {
   if (!form.videoUrl.trim()) return form.videoDurationSeconds === null
-  return Number.isInteger(form.videoDurationSeconds) && (form.videoDurationSeconds ?? 0) > 0 && (form.videoDurationSeconds ?? 0) <= 43200
+  return (
+    Number.isInteger(form.videoDurationSeconds) &&
+    (form.videoDurationSeconds ?? 0) > 0 &&
+    (form.videoDurationSeconds ?? 0) <= 43200
+  )
 })
 
 const formValid = computed(
@@ -113,7 +115,9 @@ const lessonSetupSteps = computed(() => [
   {
     label: 'Video',
     detail: form.videoUrl.trim()
-      ? (videoDurationValid.value ? 'Đã có thời lượng' : 'Thiếu thời lượng')
+      ? videoDurationValid.value
+        ? 'Đã có thời lượng'
+        : 'Thiếu thời lượng'
       : 'Không dùng video',
     done: !form.videoUrl.trim() || videoDurationValid.value,
     optional: true,
@@ -181,18 +185,13 @@ function parseYouTubeId(value: string): string | null {
     let id: string | null = null
 
     if (host === 'youtu.be') {
-      id = url.pathname
-        .split('/')
-        .filter(Boolean)[0] ?? null
+      id = url.pathname.split('/').filter(Boolean)[0] ?? null
     } else if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'm.youtube.com') {
       if (url.pathname.toLowerCase() === '/watch') {
         id = url.searchParams.get('v')
       } else {
         const segments = url.pathname.split('/').filter(Boolean)
-        if (
-          segments.length === 2 &&
-          (segments[0] === 'embed' || segments[0] === 'shorts')
-        ) {
+        if (segments.length === 2 && (segments[0] === 'embed' || segments[0] === 'shorts')) {
           id = segments[1] ?? null
         }
       }
@@ -510,7 +509,8 @@ onMounted(load)
         class="mb-5 flex flex-col justify-between gap-3 rounded-xl border border-[#efd1a7] bg-[#fff8ed] px-4 py-3 sm:flex-row sm:items-center"
       >
         <p class="text-sm leading-6 text-[#7b5521]">
-          Bài học đã được cập nhật ở nơi khác. Hãy tải lại phiên bản mới nhất trước khi tiếp tục chỉnh sửa.
+          Bài học đã được cập nhật ở nơi khác. Hãy tải lại phiên bản mới nhất trước khi tiếp tục
+          chỉnh sửa.
         </p>
 
         <button
@@ -560,21 +560,22 @@ onMounted(load)
           <div>
             <p class="text-sm font-black text-[#554a48]">Bài học đã được lưu trữ</p>
             <p class="mt-1 text-xs leading-5 text-[#786967]">
-              Nội dung được giữ để bảo toàn lịch sử học tập. Backend hiện không hỗ trợ kích hoạt lại lesson đã lưu trữ, vì vậy trang đang ở chế độ chỉ đọc.
+              Nội dung được giữ để bảo toàn lịch sử học tập. Backend hiện không hỗ trợ kích hoạt lại
+              lesson đã lưu trữ, vì vậy trang đang ở chế độ chỉ đọc.
             </p>
           </div>
         </div>
 
         <!-- Heading -->
-        <header class="mb-6 flex flex-col justify-between gap-5 border-b border-[#e4dcdb] pb-5 lg:flex-row lg:items-end">
+        <header
+          class="mb-6 flex flex-col justify-between gap-5 border-b border-[#e4dcdb] pb-5 lg:flex-row lg:items-end"
+        >
           <div class="min-w-0">
             <nav
               aria-label="Breadcrumb"
               class="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#8d7d7b]"
             >
-              <RouterLink to="/admin/courses" class="hover:text-[#a0001c]">
-                Khóa học
-              </RouterLink>
+              <RouterLink to="/admin/courses" class="hover:text-[#a0001c]"> Khóa học </RouterLink>
 
               <svg
                 class="size-3.5 text-[#b8aaa8]"
@@ -713,7 +714,13 @@ onMounted(load)
               class="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-[#d7a8ad] bg-white px-4 text-xs font-bold text-[#a0001c] transition hover:bg-[#fff4f5]"
             >
               Thiết lập câu hỏi
-              <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="size-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M5 12h14M14 7l5 5-5 5" />
               </svg>
             </RouterLink>
@@ -789,7 +796,9 @@ onMounted(load)
                       <span>Mô tả ngắn</span>
                       <span
                         class="text-[11px] font-semibold"
-                        :class="form.description.length > 4000 ? 'text-[#ba1a1a]' : 'text-[#a0918f]'"
+                        :class="
+                          form.description.length > 4000 ? 'text-[#ba1a1a]' : 'text-[#a0918f]'
+                        "
                       >
                         {{ form.description.length }}/4000
                       </span>
@@ -806,7 +815,10 @@ onMounted(load)
 
                   <!-- Video -->
                   <div>
-                    <label class="mb-2 block text-sm font-bold text-[#403735]" for="lesson-video-url">
+                    <label
+                      class="mb-2 block text-sm font-bold text-[#403735]"
+                      for="lesson-video-url"
+                    >
                       Video URL
                     </label>
 
@@ -835,10 +847,7 @@ onMounted(load)
                       </button>
                     </div>
 
-                    <p
-                      v-if="videoPreviewProblem"
-                      class="mt-2 text-xs leading-5 text-[#ba1a1a]"
-                    >
+                    <p v-if="videoPreviewProblem" class="mt-2 text-xs leading-5 text-[#ba1a1a]">
                       {{ videoPreviewProblem }}
                     </p>
                     <p v-else class="mt-2 text-xs leading-5 text-[#8d7c7a]">
@@ -846,9 +855,14 @@ onMounted(load)
                     </p>
 
                     <div v-if="form.videoUrl.trim()" class="mt-4 block max-w-sm">
-                      <span class="mb-2 block text-xs font-bold text-[#403735]">Thời lượng video tin cậy</span>
+                      <span class="mb-2 block text-xs font-bold text-[#403735]"
+                        >Thời lượng video tin cậy</span
+                      >
                       <DurationInput v-model="form.videoDurationSeconds" :disabled="isArchived" />
-                      <p class="mt-1.5 text-[11px] leading-5 text-[#8d7c7a]">Giá trị này là mốc server dùng để chống tua và khóa bài tập củng cố cho tới khi video kết thúc.</p>
+                      <p class="mt-1.5 text-[11px] leading-5 text-[#8d7c7a]">
+                        Giá trị này là mốc server dùng để chống tua và khóa bài tập củng cố cho tới
+                        khi video kết thúc.
+                      </p>
                     </div>
 
                     <div
@@ -882,10 +896,20 @@ onMounted(load)
                         class="flex flex-wrap items-center gap-1 border-b border-[#e8e0df] bg-[#faf8f7] px-3 py-2"
                         aria-label="Công cụ định dạng"
                       >
-                        <button type="button" class="editor-tool" :disabled="isArchived" @click="setBlock('h3')">
+                        <button
+                          type="button"
+                          class="editor-tool"
+                          :disabled="isArchived"
+                          @click="setBlock('h3')"
+                        >
                           H3
                         </button>
-                        <button type="button" class="editor-tool" :disabled="isArchived" @click="setBlock('p')">
+                        <button
+                          type="button"
+                          class="editor-tool"
+                          :disabled="isArchived"
+                          @click="setBlock('p')"
+                        >
                           P
                         </button>
                         <span class="mx-1 h-5 w-px bg-[#ded5d4]" />
@@ -1004,11 +1028,13 @@ onMounted(load)
                     />
                   </div>
 
+                  <!-- eslint-disable vue/no-v-html -->
                   <div
                     v-if="safePreviewHtml"
                     class="lesson-preview text-sm leading-7 text-[#342d2d]"
                     v-html="safePreviewHtml"
                   />
+                  <!-- eslint-enable vue/no-v-html -->
 
                   <div
                     v-else
@@ -1136,11 +1162,10 @@ onMounted(load)
                 v-if="!isArchived"
                 class="rounded-2xl border border-[#efc7cb] bg-[#fff7f7] p-5 sm:p-6"
               >
-                <h2 class="text-lg font-black tracking-[-0.02em] text-[#a22435]">
-                  Vùng nguy hiểm
-                </h2>
+                <h2 class="text-lg font-black tracking-[-0.02em] text-[#a22435]">Vùng nguy hiểm</h2>
                 <p class="mt-2 text-xs leading-5 text-[#786967]">
-                  Lưu trữ sẽ ẩn bài học khỏi học viên và loại nó khỏi learning path. MVP hiện chưa có API khôi phục lesson đã lưu trữ.
+                  Lưu trữ sẽ ẩn bài học khỏi học viên và loại nó khỏi learning path. MVP hiện chưa
+                  có API khôi phục lesson đã lưu trữ.
                 </p>
 
                 <button
@@ -1170,7 +1195,9 @@ onMounted(load)
             v-if="!isArchived"
             class="sticky bottom-0 z-20 -mx-4 -mb-4 mt-7 border-t border-[#e4dcdb] bg-[#f8f7f5]/95 px-4 py-4 backdrop-blur sm:-mx-5 sm:-mb-5 sm:px-5 lg:-mx-6 lg:px-6"
           >
-            <div class="mx-auto flex max-w-[1360px] flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              class="mx-auto flex max-w-[1360px] flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between"
+            >
               <p
                 class="text-xs font-semibold"
                 :class="hasChanges ? 'text-[#a0001c]' : 'text-[#988784]'"
@@ -1200,8 +1227,20 @@ onMounted(load)
                     fill="none"
                     aria-hidden="true"
                   >
-                    <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <circle
+                      class="opacity-30"
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M21 12a9 9 0 0 0-9-9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
                   </svg>
 
                   <svg

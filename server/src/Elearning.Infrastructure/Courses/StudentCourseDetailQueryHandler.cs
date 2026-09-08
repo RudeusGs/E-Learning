@@ -1,3 +1,5 @@
+using Elearning.Application.Common;
+using Elearning.Application.Common.Interfaces;
 using Elearning.Application.Courses;
 using Elearning.Application.Exceptions;
 using Elearning.Application.Lessons;
@@ -9,14 +11,24 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Courses;
 
 public sealed class StudentCourseDetailQueryHandler(
-    ElearningDbContext dbContext) : IStudentCourseDetailQueryHandler
+    ElearningDbContext dbContext,
+    ICacheService cacheService) : IStudentCourseDetailQueryHandler
 {
     public async Task<StudentCourseDetailDto> ExecuteAsync(
         GetStudentCourseQuery query,
         CancellationToken cancellationToken)
     {
+        var cacheKey = CacheKeys.StudentCourseDetail(query.StudentId, query.CourseId);
+        var cachedResult = await cacheService.GetAsync<StudentCourseDetailDto>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         var projection = await LoadCourseAndLessonsAsync(query.StudentId, query.CourseId, cancellationToken);
-        return CreateResponse(projection.Course, projection.Lessons);
+        var result = CreateResponse(projection.Course, projection.Lessons);
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5), cancellationToken);
+        return result;
     }
 
     private async Task<CourseDetailProjection> LoadCourseAndLessonsAsync(

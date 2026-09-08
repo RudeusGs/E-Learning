@@ -158,12 +158,7 @@ function generatePassword(): string {
   const symbols = '!@#$%*-_'
   const all = `${upper}${lower}${digits}${symbols}`
 
-  const required = [
-    securePick(upper),
-    securePick(lower),
-    securePick(digits),
-    securePick(symbols),
-  ]
+  const required = [securePick(upper), securePick(lower), securePick(digits), securePick(symbols)]
 
   while (required.length < 14) {
     required.push(securePick(all))
@@ -407,11 +402,7 @@ onBeforeUnmount(() => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="index in 6"
-              :key="index"
-              class="border-b border-[#f0eae9] last:border-0"
-            >
+            <tr v-for="index in 6" :key="index" class="border-b border-[#f0eae9] last:border-0">
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
                   <div class="size-10 animate-pulse rounded-full bg-[#eee8e7]" />
@@ -624,9 +615,7 @@ onBeforeUnmount(() => {
           {{ loading ? 'Đang tải…' : 'Tải thêm' }}
         </button>
 
-        <span v-else class="text-xs font-medium text-[#a39492]">
-          Đã hiển thị toàn bộ
-        </span>
+        <span v-else class="text-xs font-medium text-[#a39492]"> Đã hiển thị toàn bộ </span>
       </div>
     </div>
 
@@ -647,7 +636,9 @@ onBeforeUnmount(() => {
           aria-labelledby="create-student-title"
         >
           <!-- Drawer header -->
-          <div class="flex items-start justify-between gap-4 border-b border-[#ece5e4] bg-[#faf8f7] px-5 py-5 sm:px-6">
+          <div
+            class="flex items-start justify-between gap-4 border-b border-[#ece5e4] bg-[#faf8f7] px-5 py-5 sm:px-6"
+          >
             <div>
               <p class="text-[10px] font-black uppercase tracking-[0.16em] text-[#a0001c]">
                 Tài khoản học viên
@@ -813,7 +804,9 @@ onBeforeUnmount(() => {
                         stroke-width="1.8"
                         aria-hidden="true"
                       >
-                        <path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.3A10 10 0 0 1 12 4c6 0 9.5 8 9.5 8a16 16 0 0 1-2.1 3.1M6.2 6.2C3.8 7.8 2.5 12 2.5 12S6 20 12 20a9.7 9.7 0 0 0 4.1-.9" />
+                        <path
+                          d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.3A10 10 0 0 1 12 4c6 0 9.5 8 9.5 8a16 16 0 0 1-2.1 3.1M6.2 6.2C3.8 7.8 2.5 12 2.5 12S6 20 12 20a9.7 9.7 0 0 0 4.1-.9"
+                        />
                       </svg>
                     </button>
 
@@ -860,7 +853,8 @@ onBeforeUnmount(() => {
                 class="rounded-xl border border-[#eadfdf] bg-[#faf7f6] px-4 py-3.5 text-xs leading-5 text-[#786967]"
               >
                 <strong class="text-[#544846]">Lưu ý:</strong>
-                backend hiện chưa có chức năng bắt buộc đổi mật khẩu ở lần đăng nhập đầu tiên, nên form này không hiển thị tùy chọn giả đó.
+                backend hiện chưa có chức năng bắt buộc đổi mật khẩu ở lần đăng nhập đầu tiên, nên
+                form này không hiển thị tùy chọn giả đó.
               </div>
             </div>
           </form>

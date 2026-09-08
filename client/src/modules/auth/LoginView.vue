@@ -38,7 +38,9 @@ const errorMessage = computed(() => {
     return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối và thử lại.'
   }
 
-  return problem.value.detail || problem.value.title || 'Đăng nhập không thành công. Vui lòng thử lại.'
+  return (
+    problem.value.detail || problem.value.title || 'Đăng nhập không thành công. Vui lòng thử lại.'
+  )
 })
 
 const errorTitle = computed(() => {
@@ -59,6 +61,7 @@ async function submit(): Promise<void> {
   if (loading.value) return
 
   if (!email.value.trim() || !password.value) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     problem.value = { code: 'MISSING_FIELDS' } as any
     return
   }
@@ -128,29 +131,19 @@ function getSafeRedirect(value: unknown, fallback: string): string {
           class="absolute left-[38%] top-[69%] h-px w-[23%] origin-right -rotate-[22deg] bg-gradient-to-l from-white/20 to-white/5"
         />
 
-        <span
-          class="learning-node absolute left-[61%] top-[19%]"
-        />
-        <span
-          class="learning-node learning-node-active absolute left-[61%] top-[43%]"
-        />
-        <span
-          class="learning-node absolute left-[61%] top-[70%]"
-        />
-        <span
-          class="learning-node absolute left-[74%] top-[54%]"
-        />
-        <span
-          class="learning-node absolute left-[84%] top-[67%]"
-        />
-        <span
-          class="learning-node absolute left-[38%] top-[69%]"
-        />
+        <span class="learning-node absolute left-[61%] top-[19%]" />
+        <span class="learning-node learning-node-active absolute left-[61%] top-[43%]" />
+        <span class="learning-node absolute left-[61%] top-[70%]" />
+        <span class="learning-node absolute left-[74%] top-[54%]" />
+        <span class="learning-node absolute left-[84%] top-[67%]" />
+        <span class="learning-node absolute left-[38%] top-[69%]" />
 
         <div
           class="absolute left-[64%] top-[39%] rounded-xl border border-white/15 bg-black/10 px-4 py-3 backdrop-blur-sm"
         >
-          <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">Bài hiện tại</p>
+          <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
+            Bài hiện tại
+          </p>
           <p class="mt-1 text-sm font-semibold text-white">Tiếp tục học tập</p>
         </div>
       </div>
@@ -240,13 +233,13 @@ function getSafeRedirect(value: unknown, fallback: string): string {
         </div>
       </div>
 
-      <p class="relative z-10 text-xs font-medium text-white/38">
-        © MindX · Hệ thống học tập
-      </p>
+      <p class="relative z-10 text-xs font-medium text-white/38">© MindX · Hệ thống học tập</p>
     </section>
 
     <!-- Login panel -->
-    <section class="relative flex min-h-screen items-center justify-center px-5 py-10 sm:px-8 lg:min-h-0">
+    <section
+      class="relative flex min-h-screen items-center justify-center px-5 py-10 sm:px-8 lg:min-h-0"
+    >
       <div
         class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_50%_0%,rgba(201,21,43,0.06),transparent_70%)] lg:hidden"
       />
@@ -283,7 +276,9 @@ function getSafeRedirect(value: unknown, fallback: string): string {
           role="alert"
           aria-live="polite"
         >
-          <div class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#ba1a1a] text-white">
+          <div
+            class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#ba1a1a] text-white"
+          >
             <svg
               class="size-4"
               viewBox="0 0 24 24"
@@ -394,7 +389,9 @@ function getSafeRedirect(value: unknown, fallback: string): string {
                   aria-hidden="true"
                 >
                   <path d="m3 3 18 18" />
-                  <path d="M10.6 6.2A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a15 15 0 0 1-2.1 2.7M6.2 6.2C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9 9 0 0 0 3.2-.6" />
+                  <path
+                    d="M10.6 6.2A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a15 15 0 0 1-2.1 2.7M6.2 6.2C3.8 7.7 2.5 12 2.5 12s3.5 6 9.5 6a9 9 0 0 0 3.2-.6"
+                  />
                   <path d="M9.8 9.8a3 3 0 0 0 4.4 4.4" />
                 </svg>
               </button>
@@ -416,12 +413,7 @@ function getSafeRedirect(value: unknown, fallback: string): string {
             class="group relative mt-1 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[#c9152b] px-5 text-sm font-bold text-white shadow-[0_10px_24px_rgba(160,0,28,0.18)] transition hover:bg-[#a0001c] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c9152b]/20 disabled:cursor-not-allowed disabled:opacity-65"
           >
             <span v-if="loading" class="inline-flex items-center gap-2.5">
-              <svg
-                class="size-4.5 animate-spin"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
+              <svg class="size-4.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle
                   class="opacity-30"
                   cx="12"

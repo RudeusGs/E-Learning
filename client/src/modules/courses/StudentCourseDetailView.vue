@@ -21,9 +21,7 @@ const continueLesson = computed<StudentLessonSummary | null>(() => {
   if (!course.value) return null
 
   return (
-    course.value.lessons.find(
-      (lesson) => lesson.canAccess && lesson.state !== 'COMPLETED',
-    ) ?? null
+    course.value.lessons.find((lesson) => lesson.canAccess && lesson.state !== 'COMPLETED') ?? null
   )
 })
 
@@ -147,9 +145,7 @@ onMounted(load)
 
       <template v-if="course">
         <!-- Hero -->
-        <section
-          class="course-hero relative overflow-hidden bg-[#7f1020] text-white"
-        >
+        <section class="course-hero relative overflow-hidden bg-[#7f1020] text-white">
           <div class="academic-grid absolute inset-0 opacity-35" />
           <div
             class="pointer-events-none absolute -right-28 -top-32 size-[430px] rounded-full border-[72px] border-white/[0.035]"
@@ -304,7 +300,9 @@ onMounted(load)
                       <strong class="block text-[30px] font-black leading-none">
                         {{ course.percentage }}%
                       </strong>
-                      <span class="mt-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-white/55">
+                      <span
+                        class="mt-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-white/55"
+                      >
                         Hoàn thành
                       </span>
                     </div>
@@ -388,10 +386,9 @@ onMounted(load)
               <div
                 class="absolute left-[13px] top-5 w-px bg-[#c9152b] transition-[height] duration-700 sm:left-[15px]"
                 :style="{
-                  height: `calc((100% - 2.5rem) * ${Math.max(
-                    0,
-                    Math.min(100, course.percentage),
-                  ) / 100})`,
+                  height: `calc((100% - 2.5rem) * ${
+                    Math.max(0, Math.min(100, course.percentage)) / 100
+                  })`,
                 }"
                 aria-hidden="true"
               />
@@ -425,10 +422,7 @@ onMounted(load)
                       <path d="m6 12 4 4 8-8" />
                     </svg>
 
-                    <span
-                      v-else-if="lesson.canAccess"
-                      class="size-2 rounded-full bg-current"
-                    />
+                    <span v-else-if="lesson.canAccess" class="size-2 rounded-full bg-current" />
 
                     <svg
                       v-else
@@ -461,9 +455,7 @@ onMounted(load)
                           <span
                             class="text-[10px] font-black uppercase tracking-[0.13em]"
                             :class="
-                              lesson.id === continueLesson?.id
-                                ? 'text-[#a0001c]'
-                                : 'text-[#998784]'
+                              lesson.id === continueLesson?.id ? 'text-[#a0001c]' : 'text-[#998784]'
                             "
                           >
                             {{ lessonLabel(index) }}
@@ -491,7 +483,9 @@ onMounted(load)
                           {{ lesson.title }}
                         </h3>
 
-                        <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#958582]">
+                        <div
+                          class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#958582]"
+                        >
                           <span>{{ lessonStateLabel(lesson) }}</span>
                           <span>Thứ tự {{ lesson.sortOrder }}</span>
                         </div>
@@ -535,11 +529,15 @@ onMounted(load)
                   >
                     <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                       <div class="min-w-0">
-                        <span class="text-[10px] font-black uppercase tracking-[0.13em] text-[#a0918f]">
+                        <span
+                          class="text-[10px] font-black uppercase tracking-[0.13em] text-[#a0918f]"
+                        >
                           {{ lessonLabel(index) }}
                         </span>
 
-                        <h3 class="mt-1.5 text-[15px] font-bold leading-6 text-[#746764] sm:text-base">
+                        <h3
+                          class="mt-1.5 text-[15px] font-bold leading-6 text-[#746764] sm:text-base"
+                        >
                           {{ lesson.title }}
                         </h3>
 
@@ -593,9 +591,7 @@ onMounted(load)
                 <span
                   class="grid size-11 place-items-center rounded-xl"
                   :class="
-                    isCompleted
-                      ? 'bg-[#e8f7ef] text-[#16875b]'
-                      : 'bg-[#fff0f1] text-[#c9152b]'
+                    isCompleted ? 'bg-[#e8f7ef] text-[#16875b]' : 'bg-[#fff0f1] text-[#c9152b]'
                   "
                 >
                   <svg
@@ -621,9 +617,7 @@ onMounted(load)
 
               <dl class="mt-5 grid grid-cols-3 gap-2">
                 <div class="rounded-xl bg-[#faf7f6] px-2 py-3 text-center">
-                  <dt class="text-[9px] font-black uppercase tracking-wide text-[#9b8987]">
-                    Tổng
-                  </dt>
+                  <dt class="text-[9px] font-black uppercase tracking-wide text-[#9b8987]">Tổng</dt>
                   <dd class="mt-1 text-lg font-black text-[#403735]">
                     {{ course.totalLessons }}
                   </dd>
@@ -666,9 +660,7 @@ onMounted(load)
               </RouterLink>
             </section>
 
-            <section
-              class="rounded-2xl border border-[#e5dedd] bg-white p-5 sm:p-6"
-            >
+            <section class="rounded-2xl border border-[#e5dedd] bg-white p-5 sm:p-6">
               <h2 class="text-sm font-black text-[#403735]">Cách mở khóa bài học</h2>
 
               <div class="mt-4 space-y-4">
@@ -737,11 +729,10 @@ onMounted(load)
                   </svg>
                 </span>
 
-                <p class="mt-4 text-sm font-black text-[#403735]">
-                  E Leaning MindX
-                </p>
+                <p class="mt-4 text-sm font-black text-[#403735]">E Leaning MindX</p>
                 <p class="mt-1.5 text-xs leading-5 text-[#81716f]">
-                  Lộ trình trên được lấy trực tiếp từ dữ liệu enrollment, lesson và tiến độ của tài khoản đang đăng nhập.
+                  Lộ trình trên được lấy trực tiếp từ dữ liệu enrollment, lesson và tiến độ của tài
+                  khoản đang đăng nhập.
                 </p>
               </div>
             </section>

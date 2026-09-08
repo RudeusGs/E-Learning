@@ -17,7 +17,9 @@ const initials = computed(() => {
   return `${parts[0]?.[0] ?? ''}${parts[parts.length - 1]?.[0] ?? ''}`.toUpperCase()
 })
 
-const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên' : user.value?.role ?? ''))
+const roleLabel = computed(() =>
+  user.value?.role === 'STUDENT' ? 'Học viên' : (user.value?.role ?? ''),
+)
 </script>
 
 <template>
@@ -27,9 +29,7 @@ const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên'
       <p class="text-[10px] font-black uppercase tracking-[0.17em] text-[#a0001c]">
         Tài khoản học tập
       </p>
-      <h1
-        class="mt-2 text-[29px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[34px]"
-      >
+      <h1 class="mt-2 text-[29px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[34px]">
         Hồ sơ cá nhân
       </h1>
       <p class="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#6b5d5c] sm:text-[15px]">
@@ -184,7 +184,6 @@ const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên'
             </div>
           </div>
 
-
           <div>
             <p class="mb-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#91817e]">
               Loại tài khoản
@@ -235,8 +234,8 @@ const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên'
               Thông tin tài khoản được quản lý bởi hệ thống
             </p>
             <p class="mt-1 text-xs leading-5 text-[#756765]">
-              Phiên bản hiện tại chưa có chức năng tự chỉnh sửa hồ sơ học viên.
-              Nếu họ tên hoặc email chưa chính xác, vui lòng liên hệ quản trị viên để được cập nhật.
+              Phiên bản hiện tại chưa có chức năng tự chỉnh sửa hồ sơ học viên. Nếu họ tên hoặc
+              email chưa chính xác, vui lòng liên hệ quản trị viên để được cập nhật.
             </p>
           </div>
         </div>
@@ -286,9 +285,7 @@ const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên'
         </svg>
       </RouterLink>
 
-      <div
-        class="flex items-center gap-4 rounded-xl border border-[#e5dedd] bg-[#faf8f7] p-4"
-      >
+      <div class="flex items-center gap-4 rounded-xl border border-[#e5dedd] bg-[#faf8f7] p-4">
         <span
           class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f0eceb] text-[#756765]"
         >
@@ -306,9 +303,7 @@ const roleLabel = computed(() => (user.value?.role === 'STUDENT' ? 'Học viên'
         </span>
 
         <span class="min-w-0">
-          <strong class="block text-sm font-black text-[#4f4442]">
-            Hồ sơ chỉ đọc
-          </strong>
+          <strong class="block text-sm font-black text-[#4f4442]"> Hồ sơ chỉ đọc </strong>
           <span class="mt-1 block text-xs leading-5 text-[#81716f]">
             Không có thao tác lưu giả hoặc upload avatar giả ở frontend.
           </span>

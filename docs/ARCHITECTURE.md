@@ -601,19 +601,13 @@ Nếu có concurrency conflict, trả 409 hoặc retry bounded khi operation an 
 
 ## 22. Caching
 
-MVP không dùng Redis.
+Hệ thống sử dụng Redis làm server-side cache.
 
-Không cache progress/enrollment/authorization state trước khi có bằng chứng cần thiết.
-
-HTTP/browser caching có thể dùng cho static assets.
-
-Nếu sau này thêm cache server-side, phải định nghĩa rõ:
-
-- source of truth.
-- TTL.
-- invalidation.
-- stale behavior.
-- security isolation.
+- source of truth: PostgreSQL database.
+- TTL: Ngắn (ví dụ: 5 phút) cho các read-heavy queries (như Course Catalog) để giảm tải DB mà không cần event-driven invalidation phức tạp.
+- invalidation: Dựa trên TTL (Time-To-Live).
+- stale behavior: Trả về dữ liệu cũ trong khoảng thời gian TTL.
+- security isolation: Không cache authorization state (claims, permissions) hoặc progress chưa commit. Các queries có logic phân quyền phải kết hợp user ID trong cache key hoặc query trực tiếp DB.
 
 ## 23. Observability
 

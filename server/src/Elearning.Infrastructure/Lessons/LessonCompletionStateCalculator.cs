@@ -47,6 +47,33 @@ public sealed class LessonCompletionStateCalculator(
             .SingleOrDefaultAsync(cancellationToken)
             ?? new CompletionQuestionStats(0, 0, 0, 0);
 
+        return CalculateCore(stats, videoRequired, videoDurationSeconds, progressStatus, videoCompletedAtUtc);
+    }
+
+    public static LessonCompletionStateDto Calculate(
+        IReadOnlyList<Elearning.Application.Exercises.StudentQuestionDto> questions,
+        bool videoRequired,
+        int? videoDurationSeconds,
+        LessonProgressStatus? progressStatus,
+        DateTimeOffset? videoCompletedAtUtc)
+    {
+        var stats = new CompletionQuestionStats(
+            questions.Count(q => q.Placement == QuestionPlacement.VideoCheckpoint),
+            questions.Count(q => q.Placement == QuestionPlacement.VideoCheckpoint && q.Passed),
+            questions.Count(q => q.Placement == QuestionPlacement.Reinforcement),
+            questions.Count(q => q.Placement == QuestionPlacement.Reinforcement && q.Passed));
+
+        return CalculateCore(stats, videoRequired, videoDurationSeconds, progressStatus, videoCompletedAtUtc);
+    }
+
+    private static LessonCompletionStateDto CalculateCore(
+        CompletionQuestionStats stats,
+        bool videoRequired,
+        int? videoDurationSeconds,
+        LessonProgressStatus? progressStatus,
+        DateTimeOffset? videoCompletedAtUtc)
+    {
+
         var reinforcementScore = stats.ReinforcementTotal == 0
             ? 100
             : (int)Math.Round(

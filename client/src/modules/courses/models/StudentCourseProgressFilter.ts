@@ -1,4 +1,1 @@
-export type StudentCourseProgressFilter =
-  | 'IN_PROGRESS'
-  | 'NOT_STARTED'
-  | 'COMPLETED'
+export type StudentCourseProgressFilter = 'IN_PROGRESS' | 'NOT_STARTED' | 'COMPLETED'

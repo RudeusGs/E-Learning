@@ -62,7 +62,11 @@ const formValid = computed(() => {
   if (form.placement === 'VIDEO_CHECKPOINT') {
     if (!lesson.value?.video || !lesson.value.videoDurationSeconds) return false
     if (!Number.isInteger(form.videoTimestampSeconds)) return false
-    if ((form.videoTimestampSeconds ?? 0) < 1 || (form.videoTimestampSeconds ?? 0) >= lesson.value.videoDurationSeconds) return false
+    if (
+      (form.videoTimestampSeconds ?? 0) < 1 ||
+      (form.videoTimestampSeconds ?? 0) >= lesson.value.videoDurationSeconds
+    )
+      return false
   }
 
   if (form.type === 'TRUE_FALSE') {
@@ -239,12 +243,7 @@ async function reloadQuestions(): Promise<void> {
 }
 
 async function submitQuestion(): Promise<void> {
-  if (
-    saving.value ||
-    !formValid.value ||
-    isArchivedLesson.value ||
-    !lesson.value
-  ) {
+  if (saving.value || !formValid.value || isArchivedLesson.value || !lesson.value) {
     return
   }
 
@@ -255,7 +254,8 @@ async function submitQuestion(): Promise<void> {
     text: form.text.trim(),
     type: form.type,
     placement: form.placement,
-    videoTimestampSeconds: form.placement === 'VIDEO_CHECKPOINT' ? form.videoTimestampSeconds : null,
+    videoTimestampSeconds:
+      form.placement === 'VIDEO_CHECKPOINT' ? form.videoTimestampSeconds : null,
     explanation: form.explanation.trim() || null,
     sortOrder: form.sortOrder,
     options: form.options.map((content, index) => ({
@@ -303,11 +303,7 @@ async function submitQuestion(): Promise<void> {
 }
 
 async function deleteQuestion(question: AdminQuestion): Promise<void> {
-  if (
-    deletingId.value !== null ||
-    isArchivedLesson.value ||
-    isHistoryLocked(question.id)
-  ) {
+  if (deletingId.value !== null || isArchivedLesson.value || isHistoryLocked(question.id)) {
     return
   }
 
@@ -371,7 +367,11 @@ onMounted(load)
 
       <div class="grid gap-6 xl:grid-cols-[minmax(0,2fr)_380px]">
         <div class="space-y-5">
-          <div v-for="index in 3" :key="index" class="h-72 animate-pulse rounded-2xl bg-[#eee8e7]" />
+          <div
+            v-for="index in 3"
+            :key="index"
+            class="h-72 animate-pulse rounded-2xl bg-[#eee8e7]"
+          />
         </div>
         <div class="h-[620px] animate-pulse rounded-2xl bg-[#eee8e7]" />
       </div>
@@ -412,10 +412,14 @@ onMounted(load)
                 aria-label="Breadcrumb"
                 class="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#8d7d7b]"
               >
-                <RouterLink to="/admin/courses" class="hover:text-[#a0001c]">
-                  Khóa học
-                </RouterLink>
-                <svg class="size-3.5 text-[#b8aaa8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <RouterLink to="/admin/courses" class="hover:text-[#a0001c]"> Khóa học </RouterLink>
+                <svg
+                  class="size-3.5 text-[#b8aaa8]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="m9 18 6-6-6-6" />
                 </svg>
                 <RouterLink
@@ -424,7 +428,13 @@ onMounted(load)
                 >
                   {{ course.title }}
                 </RouterLink>
-                <svg class="size-3.5 text-[#b8aaa8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="size-3.5 text-[#b8aaa8]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="m9 18 6-6-6-6" />
                 </svg>
                 <RouterLink
@@ -433,7 +443,13 @@ onMounted(load)
                 >
                   {{ lesson.title }}
                 </RouterLink>
-                <svg class="size-3.5 text-[#b8aaa8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="size-3.5 text-[#b8aaa8]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="m9 18 6-6-6-6" />
                 </svg>
                 <span class="text-[#403735]">Câu hỏi & kiểm tra</span>
@@ -442,11 +458,14 @@ onMounted(load)
               <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">
                 {{ lesson.title }}
               </p>
-              <h1 class="mt-1.5 text-[27px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[30px]">
+              <h1
+                class="mt-1.5 text-[27px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[30px]"
+              >
                 Câu hỏi & kiểm tra
               </h1>
               <p class="mt-2 text-sm leading-6 text-[#6b5d5c] sm:text-[15px]">
-                Tạo checkpoint trong video hoặc bài củng cố cuối bài. Hệ thống dùng các câu hỏi này để quyết định học viên có đủ điều kiện hoàn thành lesson hay chưa.
+                Tạo checkpoint trong video hoặc bài củng cố cuối bài. Hệ thống dùng các câu hỏi này
+                để quyết định học viên có đủ điều kiện hoàn thành lesson hay chưa.
               </p>
             </div>
 
@@ -456,7 +475,13 @@ onMounted(load)
               class="inline-flex h-10 shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-[#c9152b] px-4 text-sm font-bold text-white shadow-[0_6px_15px_rgba(160,0,28,0.12)] hover:bg-[#a0001c] lg:self-auto"
               @click="startCreate"
             >
-              <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M12 5v14M5 12h14" />
               </svg>
               Thêm câu hỏi
@@ -470,17 +495,24 @@ onMounted(load)
         >
           <div class="rounded-lg border border-[#e6dedd] bg-white p-3">
             <div class="flex items-center gap-2">
-              <span class="grid size-7 place-items-center rounded-lg bg-[#fff0f1] text-xs font-black text-[#a0001c]">1</span>
+              <span
+                class="grid size-7 place-items-center rounded-lg bg-[#fff0f1] text-xs font-black text-[#a0001c]"
+                >1</span
+              >
               <strong class="text-xs text-[#403735]">Checkpoint trong video</strong>
             </div>
             <p class="mt-2 text-[11px] leading-5 text-[#81716f]">
-              Dùng khi muốn học viên dừng đúng một mốc trong video và trả lời đúng mới được xem tiếp.
+              Dùng khi muốn học viên dừng đúng một mốc trong video và trả lời đúng mới được xem
+              tiếp.
             </p>
           </div>
 
           <div class="rounded-lg border border-[#e6dedd] bg-white p-3">
             <div class="flex items-center gap-2">
-              <span class="grid size-7 place-items-center rounded-lg bg-[#f0f7f3] text-xs font-black text-[#16764f]">2</span>
+              <span
+                class="grid size-7 place-items-center rounded-lg bg-[#f0f7f3] text-xs font-black text-[#16764f]"
+                >2</span
+              >
               <strong class="text-xs text-[#403735]">Củng cố cuối bài</strong>
             </div>
             <p class="mt-2 text-[11px] leading-5 text-[#81716f]">
@@ -490,7 +522,9 @@ onMounted(load)
         </section>
 
         <!-- Main 8/4 layout -->
-        <div class="grid gap-4 xl:h-[calc(100vh-190px)] xl:grid-cols-[minmax(0,2fr)_350px] xl:items-start">
+        <div
+          class="grid gap-4 xl:h-[calc(100vh-190px)] xl:grid-cols-[minmax(0,2fr)_350px] xl:items-start"
+        >
           <!-- Question list -->
           <div class="min-w-0 space-y-4 xl:max-h-[calc(100vh-190px)] xl:overflow-y-auto xl:pr-2">
             <div class="flex items-center justify-between gap-4">
@@ -509,8 +543,16 @@ onMounted(load)
               v-if="questions.length === 0"
               class="flex min-h-[340px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#d9cecd] bg-white/60 px-6 py-12 text-center"
             >
-              <div class="grid size-16 place-items-center rounded-2xl border border-[#eadfdf] bg-white text-[#a18d8b]">
-                <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <div
+                class="grid size-16 place-items-center rounded-2xl border border-[#eadfdf] bg-white text-[#a18d8b]"
+              >
+                <svg
+                  class="size-8"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
                   <rect x="4" y="3" width="16" height="18" rx="2" />
                   <path d="M8 8h8M8 12h5M8 16h3" />
                 </svg>
@@ -525,7 +567,13 @@ onMounted(load)
                 class="mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-[#c9152b] px-4 text-sm font-bold text-white hover:bg-[#a0001c]"
                 @click="startCreate"
               >
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 Thêm câu hỏi đầu tiên
@@ -546,7 +594,9 @@ onMounted(load)
             >
               <div class="flex items-start justify-between gap-4">
                 <div class="flex min-w-0 flex-wrap items-center gap-2">
-                  <span class="rounded-lg bg-[#f1edec] px-2.5 py-1 text-[11px] font-black text-[#5f5351]">
+                  <span
+                    class="rounded-lg bg-[#f1edec] px-2.5 py-1 text-[11px] font-black text-[#5f5351]"
+                  >
                     Câu {{ questionIndex + 1 }}
                   </span>
 
@@ -561,7 +611,9 @@ onMounted(load)
                     {{ typeLabel(question.type) }}
                   </span>
 
-                  <span class="rounded-md border border-[#e4dcdb] bg-[#faf7f6] px-2 py-1 text-[9px] font-bold text-[#756765]">
+                  <span
+                    class="rounded-md border border-[#e4dcdb] bg-[#faf7f6] px-2 py-1 text-[9px] font-bold text-[#756765]"
+                  >
                     {{ placementLabel(question) }}
                   </span>
 
@@ -578,7 +630,13 @@ onMounted(load)
                     title="Chỉnh sửa câu hỏi"
                     @click="startEdit(question)"
                   >
-                    <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <svg
+                      class="size-4.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
                       <path d="M12 20h9" />
                       <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
                     </svg>
@@ -591,7 +649,13 @@ onMounted(load)
                     title="Xóa câu hỏi"
                     @click="deleteQuestion(question)"
                   >
-                    <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <svg
+                      class="size-4.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
                       <path d="M4 7h16M6 7v13h12V7M9 11v5M15 11v5M8 4h8" />
                     </svg>
                   </button>
@@ -602,12 +666,19 @@ onMounted(load)
                 v-if="isHistoryLocked(question.id)"
                 class="mt-4 flex items-start gap-2.5 rounded-xl border border-[#edd5a9] bg-[#fff8ec] px-3.5 py-3"
               >
-                <svg class="mt-0.5 size-4 shrink-0 text-[#b56a12]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <svg
+                  class="mt-0.5 size-4 shrink-0 text-[#b56a12]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                >
                   <path d="M12 9v4M12 17h.01" />
                   <circle cx="12" cy="12" r="9" />
                 </svg>
                 <p class="text-xs leading-5 text-[#7a592c]">
-                  Câu hỏi đã có lịch sử trả lời nên không thể sửa hoặc xóa. Hãy tạo câu hỏi thay thế nếu cần thay đổi nội dung.
+                  Câu hỏi đã có lịch sử trả lời nên không thể sửa hoặc xóa. Hãy tạo câu hỏi thay thế
+                  nếu cần thay đổi nội dung.
                 </p>
               </div>
 
@@ -617,7 +688,9 @@ onMounted(load)
 
               <div class="mt-5 space-y-2.5">
                 <div
-                  v-for="(option, optionIndex) in [...question.options].sort((a, b) => a.sortOrder - b.sortOrder)"
+                  v-for="(option, optionIndex) in [...question.options].sort(
+                    (a, b) => a.sortOrder - b.sortOrder,
+                  )"
                   :key="option.id"
                   class="flex items-center gap-3 rounded-xl border px-3.5 py-3"
                   :class="
@@ -645,7 +718,13 @@ onMounted(load)
                     v-if="option.isCorrect"
                     class="inline-flex shrink-0 items-center gap-1 text-[11px] font-black text-[#16764f]"
                   >
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <svg
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                    >
                       <circle cx="12" cy="12" r="9" />
                       <path d="m8 12 2.5 2.5L16.5 9" />
                     </svg>
@@ -659,9 +738,17 @@ onMounted(load)
                 class="mt-5 rounded-xl border border-[#e6dfde] bg-[#f7f4f3] px-4 py-3.5"
               >
                 <div class="flex items-center gap-2 text-xs font-black text-[#6d5f5d]">
-                  <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <svg
+                    class="size-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
                     <path d="M9 18h6M10 22h4" />
-                    <path d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.7-1.5 1.5-1.5 2.5h-4c0-1-.6-1.8-1.5-2.5Z" />
+                    <path
+                      d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.7-1.5 1.5-1.5 2.5h-4c0-1-.6-1.8-1.5-2.5Z"
+                    />
                   </svg>
                   Giải thích
                 </div>
@@ -703,8 +790,16 @@ onMounted(load)
               </div>
 
               <div v-if="isArchivedLesson" class="p-6 text-center">
-                <div class="mx-auto grid size-12 place-items-center rounded-xl bg-[#f1eeed] text-[#8a7b79]">
-                  <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <div
+                  class="mx-auto grid size-12 place-items-center rounded-xl bg-[#f1eeed] text-[#8a7b79]"
+                >
+                  <svg
+                    class="size-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                  >
                     <path d="M4 7h16M6 7v13h12V7M8 4h8" />
                   </svg>
                 </div>
@@ -733,7 +828,9 @@ onMounted(load)
                       <span
                         class="flex items-start gap-3 rounded-lg border border-[#e2d9d8] bg-white p-3 transition peer-checked:border-[#d99da5] peer-checked:bg-[#fff5f6] peer-focus-visible:ring-3 peer-focus-visible:ring-[#c9152b]/10"
                       >
-                        <span class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-[#f2eeed] text-xs font-black text-[#756765] peer-checked:bg-[#c9152b]">
+                        <span
+                          class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-[#f2eeed] text-xs font-black text-[#756765] peer-checked:bg-[#c9152b]"
+                        >
                           A
                         </span>
                         <span>
@@ -747,7 +844,11 @@ onMounted(load)
 
                     <label
                       class="cursor-pointer"
-                      :class="!lesson.video || !lesson.videoDurationSeconds ? 'cursor-not-allowed opacity-55' : ''"
+                      :class="
+                        !lesson.video || !lesson.videoDurationSeconds
+                          ? 'cursor-not-allowed opacity-55'
+                          : ''
+                      "
                     >
                       <input
                         v-model="form.placement"
@@ -760,11 +861,15 @@ onMounted(load)
                       <span
                         class="flex items-start gap-3 rounded-lg border border-[#e2d9d8] bg-white p-3 transition peer-checked:border-[#d99da5] peer-checked:bg-[#fff5f6] peer-focus-visible:ring-3 peer-focus-visible:ring-[#c9152b]/10"
                       >
-                        <span class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-[#fff0f1] text-xs font-black text-[#a0001c]">
+                        <span
+                          class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-[#fff0f1] text-xs font-black text-[#a0001c]"
+                        >
                           B
                         </span>
                         <span>
-                          <strong class="block text-xs text-[#403735]">Checkpoint trong video</strong>
+                          <strong class="block text-xs text-[#403735]"
+                            >Checkpoint trong video</strong
+                          >
                           <span class="mt-1 block text-[10px] leading-4 text-[#81716f]">
                             Video tự dừng tại mốc bạn chọn. Học viên phải trả lời đúng mới xem tiếp.
                           </span>
@@ -776,7 +881,9 @@ onMounted(load)
                   <label v-if="form.placement === 'VIDEO_CHECKPOINT'" class="mt-3 block">
                     <span class="mb-2 flex justify-between text-xs font-bold text-[#4a403f]">
                       <span>Xuất hiện tại giây thứ</span>
-                      <span class="text-[#a0001c]">{{ formatSeconds(form.videoTimestampSeconds ?? 0) }}</span>
+                      <span class="text-[#a0001c]">{{
+                        formatSeconds(form.videoTimestampSeconds ?? 0)
+                      }}</span>
                     </span>
                     <input
                       v-model.number="form.videoTimestampSeconds"
@@ -795,7 +902,12 @@ onMounted(load)
                     v-if="!lesson.video || !lesson.videoDurationSeconds"
                     class="mt-3 rounded-lg border border-[#efd1a7] bg-[#fff8ed] px-3 py-2 text-[10px] leading-4 text-[#7b5521]"
                   >
-                    Muốn dùng checkpoint? Quay lại <RouterLink :to="`/admin/lessons/${lesson.id}/edit`" class="font-black underline">Chỉnh sửa bài học</RouterLink>, thêm video và nhập thời lượng tin cậy trước.
+                    Muốn dùng checkpoint? Quay lại
+                    <RouterLink
+                      :to="`/admin/lessons/${lesson.id}/edit`"
+                      class="font-black underline"
+                      >Chỉnh sửa bài học</RouterLink
+                    >, thêm video và nhập thời lượng tin cậy trước.
                   </div>
                 </fieldset>
 
@@ -812,7 +924,13 @@ onMounted(load)
                         <option value="MULTIPLE_CHOICE">Nhiều lựa chọn</option>
                         <option value="TRUE_FALSE">Đúng / Sai</option>
                       </select>
-                      <svg class="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[#8d7c7a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg
+                        class="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[#8d7c7a]"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
                         <path d="m7 10 5 5 5-5" />
                       </svg>
                     </div>
@@ -833,7 +951,9 @@ onMounted(load)
 
                 <!-- Question -->
                 <label class="block">
-                  <span class="mb-2 flex items-center justify-between gap-2 text-xs font-bold text-[#4a403f]">
+                  <span
+                    class="mb-2 flex items-center justify-between gap-2 text-xs font-bold text-[#4a403f]"
+                  >
                     <span>Nội dung câu hỏi <span class="text-[#c9152b]">*</span></span>
                     <span
                       class="text-[10px]"
@@ -887,7 +1007,9 @@ onMounted(load)
                       <div
                         class="flex min-w-0 flex-1 overflow-hidden rounded-lg border border-[#ddd4d3] bg-white focus-within:border-[#c9152b] focus-within:ring-3 focus-within:ring-[#c9152b]/10"
                       >
-                        <span class="grid w-9 shrink-0 place-items-center border-r border-[#e4dcdb] bg-[#f3efee] text-xs font-black text-[#756765]">
+                        <span
+                          class="grid w-9 shrink-0 place-items-center border-r border-[#e4dcdb] bg-[#f3efee] text-xs font-black text-[#756765]"
+                        >
                           {{ optionLetter(index) }}
                         </span>
                         <input
@@ -907,7 +1029,13 @@ onMounted(load)
                         :aria-label="`Xóa lựa chọn ${optionLetter(index)}`"
                         @click="removeOption(index)"
                       >
-                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg
+                          class="size-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        >
                           <path d="M6 6l12 12M18 6 6 18" />
                         </svg>
                       </button>
@@ -920,7 +1048,13 @@ onMounted(load)
                     class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#a0001c] hover:underline"
                     @click="addOption"
                   >
-                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      class="size-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M12 5v14M5 12h14" />
                     </svg>
                     Thêm lựa chọn
@@ -933,8 +1067,12 @@ onMounted(load)
 
                 <!-- Explanation -->
                 <label class="block">
-                  <span class="mb-2 flex items-center justify-between gap-2 text-xs font-bold text-[#4a403f]">
-                    <span>Giải thích <span class="font-medium text-[#9a8987]">(tùy chọn)</span></span>
+                  <span
+                    class="mb-2 flex items-center justify-between gap-2 text-xs font-bold text-[#4a403f]"
+                  >
+                    <span
+                      >Giải thích <span class="font-medium text-[#9a8987]">(tùy chọn)</span></span
+                    >
                     <span
                       class="text-[10px]"
                       :class="form.explanation.length > 4000 ? 'text-[#ba1a1a]' : 'text-[#a0918f]'"
@@ -955,7 +1093,8 @@ onMounted(load)
                   v-if="isEditing"
                   class="rounded-lg border border-[#eadfdf] bg-[#faf7f6] px-3 py-2.5 text-[10px] leading-4 text-[#786967]"
                 >
-                  Đang sửa câu hỏi hiện có. Hệ thống dùng version để chống ghi đè thay đổi đồng thời.
+                  Đang sửa câu hỏi hiện có. Hệ thống dùng version để chống ghi đè thay đổi đồng
+                  thời.
                 </div>
 
                 <div class="flex items-center justify-end gap-2 border-t border-[#ece5e4] pt-4">
@@ -980,8 +1119,20 @@ onMounted(load)
                       fill="none"
                       aria-hidden="true"
                     >
-                      <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <circle
+                        class="opacity-30"
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke="currentColor"
+                        stroke-width="3"
+                      />
+                      <path
+                        d="M21 12a9 9 0 0 0-9-9"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                      />
                     </svg>
                     {{ saving ? 'Đang lưu…' : isEditing ? 'Lưu thay đổi' : 'Lưu câu hỏi' }}
                   </button>
@@ -996,6 +1147,9 @@ onMounted(load)
 </template>
 <style scoped>
 @media (min-width: 1280px) {
-  .xl\:overflow-y-auto { scrollbar-width: thin; scrollbar-color: #d5c8c6 transparent; }
+  .xl\:overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #d5c8c6 transparent;
+  }
 }
 </style>

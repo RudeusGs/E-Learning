@@ -1,5 +1,6 @@
 using Elearning.Application;
 using Elearning.Application.Common;
+using Elearning.Application.Common.Interfaces;
 using Elearning.Application.Progress;
 using Elearning.Domain;
 using Elearning.Infrastructure.Persistence;
@@ -8,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Progress;
 
 public sealed class AdminProgressQueryHandler(
-    ElearningDbContext dbContext) : IAdminProgressQueryHandler
+    ElearningDbContext dbContext,
+    ICacheService cacheService) : IAdminProgressQueryHandler
 {
     public async Task<CursorPage<ProgressRowDto>> ExecuteAsync(
         GetAdminProgressQuery request,
@@ -16,10 +18,21 @@ public sealed class AdminProgressQueryHandler(
     {
         var limit = RequestValidation.ValidateLimit(request.Limit);
         var search = RequestValidation.NormalizeSearch(request.Search);
+
+        var cacheKey = CacheKeys.AdminProgress(limit, request.Cursor, request.StudentId, request.CourseId, search);
+        var cachedResult = await cacheService.GetAsync<CursorPage<ProgressRowDto>>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         var position = CursorCodec.Decode<ProgressCursor>(request.Cursor);
         var query = BuildQuery(position, request.StudentId, request.CourseId, search);
         var rows = await LoadPageAsync(query, limit, cancellationToken);
-        return CreatePage(rows, limit);
+        var result = CreatePage(rows, limit);
+
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(1), cancellationToken);
+        return result;
     }
 
     private IQueryable<Enrollment> BuildQuery(

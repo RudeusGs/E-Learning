@@ -42,13 +42,11 @@ let lastObserved = 0
 let seekCorrection = false
 
 const percent = computed(() =>
-  props.durationSeconds > 0 ? Math.min(100, current.value * 100 / props.durationSeconds) : 0,
+  props.durationSeconds > 0 ? Math.min(100, (current.value * 100) / props.durationSeconds) : 0,
 )
 
 const trustedPercent = computed(() =>
-  props.durationSeconds > 0
-    ? Math.min(100, trustedMax.value * 100 / props.durationSeconds)
-    : 0,
+  props.durationSeconds > 0 ? Math.min(100, (trustedMax.value * 100) / props.durationSeconds) : 0,
 )
 
 function formatTime(seconds: number): string {
@@ -110,7 +108,9 @@ function monitor(): void {
     instance.pauseVideo()
     instance.seekTo(Math.max(0, Math.min(trustedMax.value, checkpointLimit)), true)
     message.value = 'Không thể tua tới phần chưa xem.'
-    window.setTimeout(() => { seekCorrection = false }, 400)
+    window.setTimeout(() => {
+      seekCorrection = false
+    }, 400)
     return
   }
 
@@ -210,21 +210,50 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-2xl border border-[#3f3535] bg-[#191616] text-white shadow-[0_12px_32px_rgba(31,15,18,0.16)]">
+  <div
+    class="overflow-hidden rounded-2xl border border-[#3f3535] bg-[#191616] text-white shadow-[0_12px_32px_rgba(31,15,18,0.16)]"
+  >
     <div class="relative aspect-video bg-black">
       <div ref="host" class="absolute inset-0 size-full" />
-      <button type="button" class="absolute inset-0 z-10 cursor-default" aria-label="Trình phát video được khóa tua" @click="togglePlay" />
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-black/75 to-transparent" />
+      <button
+        type="button"
+        class="absolute inset-0 z-10 cursor-default"
+        aria-label="Trình phát video được khóa tua"
+        @click="togglePlay"
+      />
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-black/75 to-transparent"
+      />
       <div class="absolute inset-x-4 bottom-4 z-30 flex items-center gap-3">
-        <button type="button" class="grid size-9 place-items-center rounded-full bg-white text-[#7f1020]" @click.stop="togglePlay">
-          <svg v-if="!playing" class="size-4" viewBox="0 0 24 24" fill="currentColor"><path d="m9 7 8 5-8 5Z" /></svg>
-          <svg v-else class="size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h4v12H7zM13 6h4v12h-4z" /></svg>
+        <button
+          type="button"
+          class="grid size-9 place-items-center rounded-full bg-white text-[#7f1020]"
+          @click.stop="togglePlay"
+        >
+          <svg v-if="!playing" class="size-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="m9 7 8 5-8 5Z" />
+          </svg>
+          <svg v-else class="size-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 6h4v12H7zM13 6h4v12h-4z" />
+          </svg>
         </button>
-        <button type="button" class="rounded-lg bg-white/12 px-2.5 py-2 text-[11px] font-bold hover:bg-white/20" @click.stop="rewind">−10s</button>
+        <button
+          type="button"
+          class="rounded-lg bg-white/12 px-2.5 py-2 text-[11px] font-bold hover:bg-white/20"
+          @click.stop="rewind"
+        >
+          −10s
+        </button>
         <div class="min-w-0 flex-1">
           <div class="relative h-1.5 overflow-hidden rounded-full bg-white/20">
-            <div class="absolute inset-y-0 left-0 rounded-full bg-white/25" :style="{ width: `${percent}%` }" />
-            <div class="absolute inset-y-0 left-0 rounded-full bg-[#ff6777]" :style="{ width: `${trustedPercent}%` }" />
+            <div
+              class="absolute inset-y-0 left-0 rounded-full bg-white/25"
+              :style="{ width: `${percent}%` }"
+            />
+            <div
+              class="absolute inset-y-0 left-0 rounded-full bg-[#ff6777]"
+              :style="{ width: `${trustedPercent}%` }"
+            />
           </div>
           <div class="mt-1.5 flex justify-between gap-3 text-[10px] font-semibold text-white/70">
             <span>{{ formatTime(current) }}</span>
@@ -232,19 +261,40 @@ onBeforeUnmount(() => {
             <span>{{ formatTime(durationSeconds) }}</span>
           </div>
         </div>
-        <button type="button" class="rounded-lg bg-white/12 px-2.5 py-2 text-[11px] font-bold hover:bg-white/20" @click.stop="toggleMute">{{ muted ? 'Bật âm' : 'Tắt âm' }}</button>
+        <button
+          type="button"
+          class="rounded-lg bg-white/12 px-2.5 py-2 text-[11px] font-bold hover:bg-white/20"
+          @click.stop="toggleMute"
+        >
+          {{ muted ? 'Bật âm' : 'Tắt âm' }}
+        </button>
       </div>
     </div>
-    <div class="border-t border-white/10 bg-[#241e1f] px-4 py-3 text-[11px] leading-5 text-white/70">
+    <div
+      class="border-t border-white/10 bg-[#241e1f] px-4 py-3 text-[11px] leading-5 text-white/70"
+    >
       <div class="flex items-start gap-2">
-        <svg class="mt-0.5 size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z" /></svg>
-        <span>{{ message || 'Xem tuần tự để hệ thống ghi nhận tiến độ. Không thể tua tới phần chưa xem; có thể tua lùi để xem lại.' }}</span>
+        <svg
+          class="mt-0.5 size-3.5 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z" />
+        </svg>
+        <span>{{
+          message ||
+          'Xem tuần tự để hệ thống ghi nhận tiến độ. Không thể tua tới phần chưa xem; có thể tua lùi để xem lại.'
+        }}</span>
       </div>
       <div class="mt-2 flex flex-wrap gap-2 pl-5 text-[10px] font-bold text-white/55">
         <span class="rounded-md bg-white/[0.07] px-2 py-1">Tốc độ 1x</span>
         <span class="rounded-md bg-white/[0.07] px-2 py-1">Đổi tab → tự dừng</span>
         <span class="rounded-md bg-white/[0.07] px-2 py-1">Checkpoint → tự bật</span>
-        <span class="rounded-md bg-white/[0.07] px-2 py-1">Đã ghi nhận {{ formatTime(trustedMax) }}</span>
+        <span class="rounded-md bg-white/[0.07] px-2 py-1"
+          >Đã ghi nhận {{ formatTime(trustedMax) }}</span
+        >
       </div>
     </div>
   </div>

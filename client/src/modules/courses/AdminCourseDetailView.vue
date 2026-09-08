@@ -437,7 +437,9 @@ onMounted(load)
                     }}
                   </p>
 
-                  <div class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-[#786967]">
+                  <div
+                    class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-[#786967]"
+                  >
                     <span class="inline-flex items-center gap-2">
                       <svg
                         class="size-4.5 text-[#9d8987]"
@@ -594,7 +596,13 @@ onMounted(load)
                 class="mt-2.5 inline-flex h-9 items-center gap-2 rounded-lg bg-[#c9152b] px-3.5 text-xs font-bold text-white transition hover:bg-[#a0001c]"
               >
                 {{ nextSetupAction.label }}
-                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="size-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M5 12h14M14 7l5 5-5 5" />
                 </svg>
               </RouterLink>
@@ -839,7 +847,13 @@ onMounted(load)
               class="grid size-9 place-items-center rounded-lg text-[#8d7d7b] hover:bg-[#f5f0ef]"
               @click="closeModal"
             >
-              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M6 6l12 12M18 6 6 18" />
               </svg>
             </button>
@@ -904,7 +918,9 @@ onMounted(load)
               </label>
             </div>
 
-            <div class="flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end">
+            <div
+              class="flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end"
+            >
               <button
                 type="button"
                 :disabled="savingCourse"
@@ -965,7 +981,13 @@ onMounted(load)
               class="grid size-9 place-items-center rounded-lg text-[#8d7d7b] hover:bg-[#f5f0ef]"
               @click="closeModal"
             >
-              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M6 6l12 12M18 6 6 18" />
               </svg>
             </button>
@@ -1036,10 +1058,13 @@ onMounted(load)
             <div
               class="rounded-xl border border-[#eadfdf] bg-[#faf7f6] px-4 py-3 text-xs leading-5 text-[#786967]"
             >
-              Sau khi tạo, hệ thống sẽ mở trang chỉnh sửa bài học để bạn thêm nội dung chi tiết và bài tập.
+              Sau khi tạo, hệ thống sẽ mở trang chỉnh sửa bài học để bạn thêm nội dung chi tiết và
+              bài tập.
             </div>
 
-            <div class="flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end">
+            <div
+              class="flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end"
+            >
               <button
                 type="button"
                 :disabled="creatingLesson"

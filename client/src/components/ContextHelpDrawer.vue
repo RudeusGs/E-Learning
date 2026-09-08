@@ -217,7 +217,9 @@ const guide = computed<GuideContent>(() => {
         aria-modal="true"
         aria-label="Hướng dẫn theo ngữ cảnh"
       >
-        <header class="flex items-start justify-between gap-4 border-b border-[#e5dedd] bg-white px-5 py-5">
+        <header
+          class="flex items-start justify-between gap-4 border-b border-[#e5dedd] bg-white px-5 py-5"
+        >
           <div>
             <p class="text-[10px] font-black uppercase tracking-[0.16em] text-[#a0001c]">
               {{ guide.eyebrow }}
@@ -233,14 +235,22 @@ const guide = computed<GuideContent>(() => {
             aria-label="Đóng hướng dẫn"
             @click="emit('close')"
           >
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M6 6l12 12M18 6 6 18" />
             </svg>
           </button>
         </header>
 
         <div class="flex-1 overflow-y-auto px-5 py-5">
-          <p class="rounded-xl border border-[#eadfdf] bg-white px-4 py-3 text-sm leading-6 text-[#665957]">
+          <p
+            class="rounded-xl border border-[#eadfdf] bg-white px-4 py-3 text-sm leading-6 text-[#665957]"
+          >
             {{ guide.goal }}
           </p>
 

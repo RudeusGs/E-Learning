@@ -102,7 +102,9 @@ async function signOut(): Promise<void> {
             <strong class="block truncate text-[15px] font-black tracking-[-0.02em]">
               E Leaning MindX
             </strong>
-            <span class="mt-0.5 block text-[10px] font-medium text-white/55">Hệ thống Giáo dục</span>
+            <span class="mt-0.5 block text-[10px] font-medium text-white/55"
+              >Hệ thống Giáo dục</span
+            >
           </span>
         </RouterLink>
       </div>
@@ -339,7 +341,10 @@ async function signOut(): Promise<void> {
             aria-label="Mở hướng dẫn cho màn hình hiện tại"
             @click="helpOpen = true"
           >
-            <span class="grid size-5 place-items-center rounded-full bg-[#fff0f1] text-[11px] font-black text-[#a0001c]">?</span>
+            <span
+              class="grid size-5 place-items-center rounded-full bg-[#fff0f1] text-[11px] font-black text-[#a0001c]"
+              >?</span
+            >
             <span class="hidden sm:inline">Hướng dẫn</span>
           </button>
           <span
@@ -402,7 +407,10 @@ async function signOut(): Promise<void> {
             aria-label="Mở hướng dẫn cho màn hình hiện tại"
             @click="helpOpen = true"
           >
-            <span class="grid size-5 place-items-center rounded-full bg-[#fff0f1] text-[11px] font-black text-[#a0001c]">?</span>
+            <span
+              class="grid size-5 place-items-center rounded-full bg-[#fff0f1] text-[11px] font-black text-[#a0001c]"
+              >?</span
+            >
             <span class="hidden xl:inline">Hướng dẫn</span>
           </button>
           <div class="hidden text-right sm:block">

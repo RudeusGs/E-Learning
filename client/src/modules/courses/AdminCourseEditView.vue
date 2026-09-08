@@ -52,13 +52,9 @@ const thumbnailValid = computed(() => {
   return value.length === 0 || value.startsWith('https://')
 })
 
-const sortOrderValid = computed(
-  () => Number.isInteger(form.sortOrder) && form.sortOrder >= 0,
-)
+const sortOrderValid = computed(() => Number.isInteger(form.sortOrder) && form.sortOrder >= 0)
 
-const formValid = computed(
-  () => titleValid.value && thumbnailValid.value && sortOrderValid.value,
-)
+const formValid = computed(() => titleValid.value && thumbnailValid.value && sortOrderValid.value)
 
 const hasChanges = computed(() => {
   if (!original.value) return false
@@ -76,9 +72,7 @@ const previewAvailable = computed(
   () => Boolean(form.thumbnailUrl.trim()) && thumbnailValid.value && !thumbnailFailed.value,
 )
 
-const statusLabel = computed(() =>
-  form.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp',
-)
+const statusLabel = computed(() => (form.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp'))
 
 const currentStatusClass = computed(() =>
   form.status === 'PUBLISHED'
@@ -252,7 +246,8 @@ onMounted(load)
           class="mb-5 flex flex-col justify-between gap-3 rounded-xl border border-[#efd1a7] bg-[#fff8ed] px-4 py-3 sm:flex-row sm:items-center"
         >
           <p class="text-sm leading-6 text-[#7b5521]">
-            Dữ liệu khóa học có thể đã được người khác cập nhật. Hãy tải phiên bản mới nhất trước khi sửa tiếp.
+            Dữ liệu khóa học có thể đã được người khác cập nhật. Hãy tải phiên bản mới nhất trước
+            khi sửa tiếp.
           </p>
           <button
             type="button"
@@ -395,9 +390,7 @@ onMounted(load)
                   </div>
 
                   <label class="block">
-                    <span class="mb-2 block text-sm font-bold text-[#403735]">
-                      Thumbnail URL
-                    </span>
+                    <span class="mb-2 block text-sm font-bold text-[#403735]"> Thumbnail URL </span>
 
                     <div class="relative">
                       <span
@@ -501,7 +494,9 @@ onMounted(load)
                         aria-hidden="true"
                       >
                         <path d="M12 9v4M12 17h.01" />
-                        <path d="M10.3 3.6 2.4 18a2 2 0 0 0 1.8 3h15.6a2 2 0 0 0 1.8-3L13.7 3.6a2 2 0 0 0-3.4 0Z" />
+                        <path
+                          d="M10.3 3.6 2.4 18a2 2 0 0 0 1.8 3h15.6a2 2 0 0 0 1.8-3L13.7 3.6a2 2 0 0 0-3.4 0Z"
+                        />
                       </svg>
                     </span>
 
@@ -510,8 +505,8 @@ onMounted(load)
                         Vùng nguy hiểm
                       </h2>
                       <p class="mt-2 max-w-2xl text-sm leading-6 text-[#786967]">
-                        Lưu trữ khóa học sẽ ẩn khóa học khỏi học viên và không cho phân công mới.
-                        Dữ liệu lịch sử và tiến độ trước đó vẫn được giữ lại.
+                        Lưu trữ khóa học sẽ ẩn khóa học khỏi học viên và không cho phân công mới. Dữ
+                        liệu lịch sử và tiến độ trước đó vẫn được giữ lại.
                       </p>
 
                       <button
@@ -550,9 +545,7 @@ onMounted(load)
 
                   <div class="mt-5 space-y-5">
                     <label class="block">
-                      <span class="mb-2 block text-sm font-bold text-[#403735]">
-                        Trạng thái
-                      </span>
+                      <span class="mb-2 block text-sm font-bold text-[#403735]"> Trạng thái </span>
 
                       <div class="relative">
                         <select
@@ -623,16 +616,15 @@ onMounted(load)
                         </svg>
 
                         <div>
-                          <h3 class="text-sm font-black text-[#403735]">
-                            Hiển thị với học viên
-                          </h3>
+                          <h3 class="text-sm font-black text-[#403735]">Hiển thị với học viên</h3>
                           <p class="mt-1.5 text-xs leading-5 text-[#756765]">
                             <template v-if="form.status === 'PUBLISHED'">
-                              Khóa học có thể xuất hiện với những học viên đang có enrollment Active.
-                              Học viên không tự đăng ký khóa học.
+                              Khóa học có thể xuất hiện với những học viên đang có enrollment
+                              Active. Học viên không tự đăng ký khóa học.
                             </template>
                             <template v-else>
-                              Khóa học chỉ hiển thị trong khu vực quản trị và không thể học từ phía học viên.
+                              Khóa học chỉ hiển thị trong khu vực quản trị và không thể học từ phía
+                              học viên.
                             </template>
                           </p>
                         </div>
@@ -659,7 +651,9 @@ onMounted(load)
             <div
               class="sticky bottom-0 z-20 -mx-4 -mb-4 mt-7 border-t border-[#e5dcdb] bg-[#f8f7f5]/95 px-4 py-4 backdrop-blur sm:-mx-5 sm:-mb-5 sm:px-5 lg:-mx-6 lg:px-6"
             >
-              <div class="mx-auto flex max-w-[1080px] flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div
+                class="mx-auto flex max-w-[1080px] flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <p
                   class="text-xs font-semibold"
                   :class="hasChanges ? 'text-[#a0001c]' : 'text-[#988784]'"

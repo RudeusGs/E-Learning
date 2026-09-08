@@ -1,3 +1,5 @@
+using Elearning.Application.Common;
+using Elearning.Application.Common.Interfaces;
 using Elearning.Application.Exceptions;
 using Elearning.Application.Progress;
 using Elearning.Domain;
@@ -8,15 +10,26 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Progress;
 
 public sealed class StudentProgressQueryHandler(
-    ElearningDbContext dbContext) : IStudentProgressQueryHandler
+    ElearningDbContext dbContext,
+    ICacheService cacheService) : IStudentProgressQueryHandler
 {
     public async Task<StudentCourseProgressDto> ExecuteAsync(
         GetStudentProgressQuery query,
         CancellationToken cancellationToken)
     {
+        var cacheKey = CacheKeys.StudentProgress(query.StudentId, query.CourseId);
+        var cachedResult = await cacheService.GetAsync<StudentCourseProgressDto>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         await EnsureCourseAccessAsync(query.StudentId, query.CourseId, cancellationToken);
         var rows = await LoadProgressAsync(query.StudentId, query.CourseId, cancellationToken);
-        return CreateResponse(query.CourseId, rows);
+        var result = CreateResponse(query.CourseId, rows);
+
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(1), cancellationToken);
+        return result;
     }
 
     private async Task EnsureCourseAccessAsync(

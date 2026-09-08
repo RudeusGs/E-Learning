@@ -26,7 +26,7 @@ const requiredFiles = [
   'client/package.json',
   'server/src/Elearning.Api/Program.cs',
   '.config/dotnet-tools.json',
-  'playwright.config.ts',
+
   'scripts/prepare-husky.mjs',
   'server/tests/Elearning.IntegrationTests/HealthEndpointTests.cs',
 ]

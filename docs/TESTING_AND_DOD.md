@@ -443,6 +443,7 @@ Task lớn nên ghi ngắn trong PR/report:
 - Security negative cases.
 - Known limitations.
 - Rollback/revert note nếu thay đổi rủi ro.
+
 ## Learning Guardrails DoD — 2026-08-29
 
 Required automated coverage:

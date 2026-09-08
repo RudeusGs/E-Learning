@@ -1,4 +1,5 @@
 using Elearning.Application.Common;
+using Elearning.Application.Common.Interfaces;
 using Elearning.Application.Courses;
 using Elearning.Application.Exceptions;
 using Elearning.Domain;
@@ -9,22 +10,34 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Courses;
 
 public sealed class StudentCourseCatalogQueryHandler(
-    ElearningDbContext dbContext) : IStudentCourseCatalogQueryHandler
+    ElearningDbContext dbContext,
+    ICacheService cacheService) : IStudentCourseCatalogQueryHandler
 {
     public async Task<CursorPage<StudentCourseDto>> ExecuteAsync(
         ListStudentCoursesQuery request,
         CancellationToken cancellationToken)
     {
         var limit = RequestValidation.ValidateLimit(request.Limit);
-        var position = CursorCodec.Decode<StudentCourseCursor>(request.Cursor);
         var progress = NormalizeProgressFilter(request.Progress);
+
+        var cacheKey = CacheKeys.StudentCourses(request.StudentId, limit, request.Cursor, progress);
+        var cachedResult = await cacheService.GetAsync<CursorPage<StudentCourseDto>>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
+        var position = CursorCodec.Decode<StudentCourseCursor>(request.Cursor);
         var rows = await LoadCoursesAsync(
             request.StudentId,
             limit,
             position,
             progress,
             cancellationToken);
-        return CreatePage(rows, limit);
+
+        var result = CreatePage(rows, limit);
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5), cancellationToken);
+        return result;
     }
 
     private Task<List<StudentCourseProjection>> LoadCoursesAsync(

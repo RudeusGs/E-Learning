@@ -11,8 +11,7 @@ namespace Elearning.Infrastructure.Lessons;
 
 public sealed class StudentLessonQueryHandler(
     ElearningDbContext dbContext,
-    StudentLessonAccessPolicy accessPolicy,
-    LessonCompletionStateCalculator completionCalculator) : IStudentLessonQueryHandler
+    StudentLessonAccessPolicy accessPolicy) : IStudentLessonQueryHandler
 {
     public async Task<StudentLessonDto> ExecuteAsync(
         GetStudentLessonQuery query,
@@ -36,14 +35,12 @@ public sealed class StudentLessonQueryHandler(
             lessonId,
             cancellationToken);
 
-        var completion = await completionCalculator.CalculateAsync(
-            studentId,
-            lessonId,
+        var completion = LessonCompletionStateCalculator.Calculate(
+            questions,
             lesson.VideoProvider is not null,
             lesson.VideoDurationSeconds,
             lesson.Progress,
-            lesson.VideoCompletedAtUtc,
-            cancellationToken);
+            lesson.VideoCompletedAtUtc);
 
         var nextLessonId = lesson.Progress == LessonProgressStatus.Completed
             ? await FindNextLessonIdAsync(

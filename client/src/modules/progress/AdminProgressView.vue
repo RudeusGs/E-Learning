@@ -250,9 +250,7 @@ onBeforeUnmount(() => {
     <!-- Page heading -->
     <header class="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
       <div>
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">
-          Theo dõi kết quả
-        </p>
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">Theo dõi kết quả</p>
         <h1 class="mt-1.5 text-[30px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[34px]">
           Tiến độ học tập
         </h1>
@@ -264,9 +262,7 @@ onBeforeUnmount(() => {
       <!-- Search + filters -->
       <div class="flex w-full flex-col gap-3 sm:flex-row xl:w-auto">
         <form class="w-full sm:min-w-[320px] xl:w-[380px]" @submit.prevent="submitSearch">
-          <label for="progress-search" class="sr-only">
-            Tìm học viên hoặc khóa học
-          </label>
+          <label for="progress-search" class="sr-only"> Tìm học viên hoặc khóa học </label>
 
           <div class="relative">
             <span
@@ -356,9 +352,7 @@ onBeforeUnmount(() => {
           >
             <div class="flex items-start justify-between gap-4">
               <div>
-                <p class="text-xs font-black uppercase tracking-[0.14em] text-[#9b8583]">
-                  Bộ lọc
-                </p>
+                <p class="text-xs font-black uppercase tracking-[0.14em] text-[#9b8583]">Bộ lọc</p>
                 <h2 class="mt-1 text-base font-black text-[#302929]">Lọc dữ liệu tiến độ</h2>
               </div>
 
@@ -426,7 +420,8 @@ onBeforeUnmount(() => {
               </p>
 
               <p class="text-[11px] leading-5 text-[#8d7c7a]">
-                Đây là filter phía server. Có thể kết hợp ID học viên, ID khóa học và ô tìm kiếm phía trên.
+                Đây là filter phía server. Có thể kết hợp ID học viên, ID khóa học và ô tìm kiếm
+                phía trên.
               </p>
             </div>
 
@@ -511,11 +506,7 @@ onBeforeUnmount(() => {
           </thead>
 
           <tbody>
-            <tr
-              v-for="index in 7"
-              :key="index"
-              class="border-b border-[#f0eae9] last:border-0"
-            >
+            <tr v-for="index in 7" :key="index" class="border-b border-[#f0eae9] last:border-0">
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
                   <div class="size-10 animate-pulse rounded-full bg-[#eee8e7]" />
@@ -635,10 +626,7 @@ onBeforeUnmount(() => {
               </td>
 
               <td class="px-5 py-4">
-                <RouterLink
-                  :to="`/admin/courses/${row.courseId}`"
-                  class="block max-w-[300px]"
-                >
+                <RouterLink :to="`/admin/courses/${row.courseId}`" class="block max-w-[300px]">
                   <strong
                     class="block truncate text-sm font-bold text-[#504644] transition hover:text-[#a0001c] hover:underline"
                   >
@@ -741,9 +729,7 @@ onBeforeUnmount(() => {
           {{ loading ? 'Đang tải…' : 'Tải thêm' }}
         </button>
 
-        <span v-else class="text-xs font-medium text-[#a39492]">
-          Đã hiển thị toàn bộ kết quả
-        </span>
+        <span v-else class="text-xs font-medium text-[#a39492]"> Đã hiển thị toàn bộ kết quả </span>
       </div>
     </div>
   </section>

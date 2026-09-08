@@ -27,7 +27,7 @@ watch(
       parseInt(mm.value || '0', 10) * 60 +
       parseInt(ss.value || '0', 10)
 
-    if (newVal === currentCalculated && (newVal !== 0 || (hh.value || mm.value || ss.value))) {
+    if (newVal === currentCalculated && (newVal !== 0 || hh.value || mm.value || ss.value)) {
       return // Same value, don't override local typing state
     }
 
@@ -45,7 +45,7 @@ watch(
       ss.value = s.toString().padStart(2, '0')
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 function updateValue() {
@@ -90,7 +90,7 @@ function handleInput(type: 'hh' | 'mm' | 'ss', event: Event) {
     }
     ss.value = val
   }
-  
+
   target.value = val
   updateValue()
 }

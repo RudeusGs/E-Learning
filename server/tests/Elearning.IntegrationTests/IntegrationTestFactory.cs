@@ -15,6 +15,13 @@ namespace Elearning.IntegrationTests;
 
 public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private sealed class DummyCacheService : Elearning.Application.Common.Interfaces.ICacheService
+    {
+        public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) => Task.FromResult<T?>(default);
+        public Task SetAsync<T>(string key, T value, TimeSpan? absoluteExpireTime = null, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task RemoveAsync(string key, CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
     public const string AdminEmail = "admin.integration@example.test";
     public const string StudentAEmail = "student-a.integration@example.test";
     public const string StudentBEmail = "student-b.integration@example.test";
@@ -106,7 +113,9 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
             // developer's local/Compose database when provider ordering changes.
             services.RemoveAll<DbContextOptions<ElearningDbContext>>();
             services.RemoveAll<ElearningDbContext>();
+            services.RemoveAll<Elearning.Application.Common.Interfaces.ICacheService>();
             services.AddSingleton<IInterceptor>(Commands);
+            services.AddSingleton<Elearning.Application.Common.Interfaces.ICacheService, DummyCacheService>();
             services.AddDbContext<ElearningDbContext>((serviceProvider, options) =>
             {
                 options.UseNpgsql(_postgres.GetConnectionString());

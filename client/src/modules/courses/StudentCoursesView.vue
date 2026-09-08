@@ -51,11 +51,7 @@ const emptyDescription = computed(() => {
 })
 
 function normalizeFilter(value: unknown): CourseFilter {
-  if (
-    value === 'IN_PROGRESS' ||
-    value === 'NOT_STARTED' ||
-    value === 'COMPLETED'
-  ) {
+  if (value === 'IN_PROGRESS' || value === 'NOT_STARTED' || value === 'COMPLETED') {
     return value
   }
 
@@ -219,7 +215,8 @@ onBeforeUnmount(() => {
           Chào {{ userName }},
         </h1>
         <p class="mt-3 max-w-2xl text-sm leading-6 text-[#6b5d5c] sm:text-base sm:leading-7">
-          Tiếp tục hành trình học tập của bạn. Dưới đây là các khóa học đang được phân công và tiến độ hiện tại.
+          Tiếp tục hành trình học tập của bạn. Dưới đây là các khóa học đang được phân công và tiến
+          độ hiện tại.
         </p>
       </div>
     </section>
@@ -235,9 +232,7 @@ onBeforeUnmount(() => {
           type="button"
           class="relative h-11 shrink-0 px-3 text-sm font-bold transition sm:px-4"
           :class="
-            activeFilter === option.value
-              ? 'text-[#a0001c]'
-              : 'text-[#756765] hover:text-[#a0001c]'
+            activeFilter === option.value ? 'text-[#a0001c]' : 'text-[#756765] hover:text-[#a0001c]'
           "
           @click="setFilter(option.value)"
         >
@@ -251,10 +246,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Initial skeleton -->
-    <div
-      v-if="loading && courses.length === 0"
-      class="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-    >
+    <div v-if="loading && courses.length === 0" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
       <article
         v-for="index in 6"
         :key="index"
@@ -412,7 +404,9 @@ onBeforeUnmount(() => {
             <RouterLink
               :to="`/student/courses/${course.id}`"
               class="group/action inline-flex h-9 items-center gap-2 rounded-lg text-sm font-black transition"
-              :class="isCompleted(course) ? 'text-[#3e4f47] hover:text-[#a0001c]' : 'text-[#a0001c]'"
+              :class="
+                isCompleted(course) ? 'text-[#3e4f47] hover:text-[#a0001c]' : 'text-[#a0001c]'
+              "
             >
               {{ courseActionLabel(course) }}
 
@@ -464,14 +458,7 @@ onBeforeUnmount(() => {
           fill="none"
           aria-hidden="true"
         >
-          <circle
-            class="opacity-30"
-            cx="12"
-            cy="12"
-            r="9"
-            stroke="currentColor"
-            stroke-width="3"
-          />
+          <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
           <path
             d="M21 12a9 9 0 0 0-9-9"
             stroke="currentColor"
@@ -482,9 +469,7 @@ onBeforeUnmount(() => {
         {{ loading ? 'Đang tải…' : 'Tải thêm khóa học' }}
       </button>
 
-      <span v-else class="text-xs font-semibold text-[#a39492]">
-        Đã hiển thị toàn bộ kết quả
-      </span>
+      <span v-else class="text-xs font-semibold text-[#a39492]"> Đã hiển thị toàn bộ kết quả </span>
     </div>
   </section>
 </template>

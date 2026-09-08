@@ -246,9 +246,7 @@ onBeforeUnmount(() => {
     <!-- Page heading -->
     <header class="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
       <div>
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">
-          Quản lý nội dung
-        </p>
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#9b8583]">Quản lý nội dung</p>
         <h1 class="mt-1.5 text-[30px] font-black tracking-[-0.03em] text-[#1c1b1b] sm:text-[34px]">
           Khóa học
         </h1>
@@ -279,14 +277,18 @@ onBeforeUnmount(() => {
     <ProblemAlert :problem="problem" />
 
     <!-- List container -->
-    <div class="overflow-hidden rounded-2xl border border-[#e5dedd] bg-white shadow-[0_1px_3px_rgba(44,24,24,0.025)]">
+    <div
+      class="overflow-hidden rounded-2xl border border-[#e5dedd] bg-white shadow-[0_1px_3px_rgba(44,24,24,0.025)]"
+    >
       <!-- Toolbar -->
       <div class="border-b border-[#ece5e4] p-4 sm:p-5">
         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <form class="w-full xl:max-w-[420px]" @submit.prevent="onSearchSubmit">
             <label class="sr-only" for="course-search">Tìm khóa học</label>
             <div class="relative">
-              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]">
+              <span
+                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]"
+              >
                 <svg
                   class="size-5"
                   viewBox="0 0 24 24"
@@ -399,11 +401,21 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
               </td>
-              <td class="px-5 py-4"><div class="h-7 w-24 animate-pulse rounded-full bg-[#f0eae9]" /></td>
-              <td class="px-5 py-4"><div class="mx-auto h-4 w-8 animate-pulse rounded bg-[#eee8e7]" /></td>
-              <td class="px-5 py-4"><div class="mx-auto h-4 w-8 animate-pulse rounded bg-[#eee8e7]" /></td>
-              <td class="px-5 py-4"><div class="mx-auto h-4 w-6 animate-pulse rounded bg-[#eee8e7]" /></td>
-              <td class="px-5 py-4"><div class="ml-auto h-8 w-8 animate-pulse rounded-lg bg-[#eee8e7]" /></td>
+              <td class="px-5 py-4">
+                <div class="h-7 w-24 animate-pulse rounded-full bg-[#f0eae9]" />
+              </td>
+              <td class="px-5 py-4">
+                <div class="mx-auto h-4 w-8 animate-pulse rounded bg-[#eee8e7]" />
+              </td>
+              <td class="px-5 py-4">
+                <div class="mx-auto h-4 w-8 animate-pulse rounded bg-[#eee8e7]" />
+              </td>
+              <td class="px-5 py-4">
+                <div class="mx-auto h-4 w-6 animate-pulse rounded bg-[#eee8e7]" />
+              </td>
+              <td class="px-5 py-4">
+                <div class="ml-auto h-8 w-8 animate-pulse rounded-lg bg-[#eee8e7]" />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -414,7 +426,9 @@ onBeforeUnmount(() => {
         v-else-if="courses.length === 0"
         class="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center"
       >
-        <div class="grid size-16 place-items-center rounded-2xl border border-[#eadfdf] bg-[#faf6f6] text-[#a98f8d]">
+        <div
+          class="grid size-16 place-items-center rounded-2xl border border-[#eadfdf] bg-[#faf6f6] text-[#a98f8d]"
+        >
           <svg
             class="size-8"
             viewBox="0 0 24 24"
@@ -429,7 +443,11 @@ onBeforeUnmount(() => {
         </div>
 
         <h2 class="mt-5 text-lg font-black text-[#342d2d]">
-          {{ search || statusFilter !== 'ALL' ? 'Không tìm thấy khóa học phù hợp' : 'Chưa có khóa học' }}
+          {{
+            search || statusFilter !== 'ALL'
+              ? 'Không tìm thấy khóa học phù hợp'
+              : 'Chưa có khóa học'
+          }}
         </h2>
         <p class="mt-2 max-w-md text-sm leading-6 text-[#81716f]">
           {{
@@ -445,7 +463,13 @@ onBeforeUnmount(() => {
           class="mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-[#c9152b] px-4 text-sm font-bold text-white hover:bg-[#a0001c]"
           @click="openCreate"
         >
-          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M12 5v14M5 12h14" />
           </svg>
           Tạo khóa học
@@ -524,7 +548,9 @@ onBeforeUnmount(() => {
               </td>
 
               <td class="px-5 py-4 text-center">
-                <span class="inline-flex min-w-8 justify-center rounded-lg bg-[#f5f1f0] px-2 py-1 text-xs font-bold text-[#6f615f]">
+                <span
+                  class="inline-flex min-w-8 justify-center rounded-lg bg-[#f5f1f0] px-2 py-1 text-xs font-bold text-[#6f615f]"
+                >
                   {{ course.sortOrder }}
                 </span>
               </td>
@@ -538,12 +564,7 @@ onBeforeUnmount(() => {
                     aria-label="Mở thao tác khóa học"
                     @click="toggleActions(course.id)"
                   >
-                    <svg
-                      class="size-5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
+                    <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <circle cx="5" cy="12" r="1.7" />
                       <circle cx="12" cy="12" r="1.7" />
                       <circle cx="19" cy="12" r="1.7" />
@@ -639,8 +660,20 @@ onBeforeUnmount(() => {
             fill="none"
             aria-hidden="true"
           >
-            <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-            <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            <circle
+              class="opacity-30"
+              cx="12"
+              cy="12"
+              r="9"
+              stroke="currentColor"
+              stroke-width="3"
+            />
+            <path
+              d="M21 12a9 9 0 0 0-9-9"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
           </svg>
           {{ loading ? 'Đang tải…' : 'Tải thêm' }}
         </button>
@@ -673,7 +706,10 @@ onBeforeUnmount(() => {
               <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[#a0001c]">
                 Khóa học mới
               </p>
-              <h2 id="create-course-title" class="mt-1 text-xl font-black tracking-[-0.02em] text-[#2c2525]">
+              <h2
+                id="create-course-title"
+                class="mt-1 text-xl font-black tracking-[-0.02em] text-[#2c2525]"
+              >
                 Tạo khóa học
               </h2>
               <p class="mt-1 text-sm text-[#81716f]">
@@ -769,11 +805,14 @@ onBeforeUnmount(() => {
                 class="rounded-xl border border-[#eadfdf] bg-[#faf7f6] px-4 py-3 text-xs leading-5 text-[#786967]"
               >
                 <strong class="text-[#5a4e4c]">Lưu ý:</strong>
-                Khóa học ở trạng thái “Bản nháp” chưa xuất hiện với học viên. Chỉ xuất bản khi nội dung đã sẵn sàng.
+                Khóa học ở trạng thái “Bản nháp” chưa xuất hiện với học viên. Chỉ xuất bản khi nội
+                dung đã sẵn sàng.
               </div>
             </div>
 
-            <div class="mt-7 flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end">
+            <div
+              class="mt-7 flex flex-col-reverse gap-3 border-t border-[#eee6e5] pt-5 sm:flex-row sm:justify-end"
+            >
               <button
                 type="button"
                 :disabled="saving"
@@ -795,8 +834,20 @@ onBeforeUnmount(() => {
                   fill="none"
                   aria-hidden="true"
                 >
-                  <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
-                  <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                  <circle
+                    class="opacity-30"
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M21 12a9 9 0 0 0-9-9"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
                 </svg>
                 {{ saving ? 'Đang tạo…' : 'Tạo khóa học' }}
               </button>

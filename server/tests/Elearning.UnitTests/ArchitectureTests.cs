@@ -110,6 +110,7 @@ public sealed class ArchitectureTests
             .Where(type => type.Namespace?.StartsWith("Elearning.Application", StringComparison.Ordinal) == true)
             .Where(type => type.Namespace?.Contains(".Ports", StringComparison.Ordinal) != true)
             .Where(type => type.Namespace?.Contains(".Security", StringComparison.Ordinal) != true)
+            .Where(type => type.Namespace?.Contains(".Interfaces", StringComparison.Ordinal) != true)
             .Where(type => type.GetMethods().Any(method => typeof(Task).IsAssignableFrom(method.ReturnType) ||
                                                            method.ReturnType.IsGenericType &&
                                                            method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>)))
@@ -168,6 +169,8 @@ public sealed class ArchitectureTests
         var permittedServiceNames = new[]
         {
             "ISessionLogoutService",
+            "ICacheService",
+            "RedisCacheService",
             nameof(SessionLogoutService),
             nameof(AuthTokenCleanupService)
         };

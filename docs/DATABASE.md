@@ -522,6 +522,7 @@ Production handover phải ghi rõ:
 - migration compatibility.
 
 Repo không tự giả định backup đã tồn tại chỉ vì dùng managed database.
+
 ## Learning Guardrails — 2026-08-29
 
 Added lesson media metadata:

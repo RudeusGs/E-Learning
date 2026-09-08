@@ -148,7 +148,8 @@ public sealed class CourseCommandCountTests(IntegrationTestFactory factory)
         largeResponse.EnsureSuccessStatusCode();
         var largeCount = factory.Commands.Commands.Count;
 
-        AssertCommandCountIsConstant(smallCount, largeCount, maximum: 8);
+        Assert.True(smallCount <= 8 && largeCount <= 8 && smallCount == largeCount,
+            $"Expected <= 8 commands. Small: {smallCount}, Large: {largeCount}\n\nLarge Commands:\n" + string.Join("\n---\n", factory.Commands.Commands));
     }
 
     [Fact]

@@ -2,11 +2,11 @@
 
 The capacity target must be expressed as concurrent activity, not registered accounts. Start with three profiles and adjust from product analytics:
 
-| Profile | Concurrent signed-in users | Concurrent video players | Approx. heartbeat RPS at 30s |
-| --- | ---: | ---: | ---: |
-| Normal class day | 1,000 | 300 | 10 |
-| Busy period | 3,000 | 1,500 | 50 |
-| Deliberate worst case | 10,000 | 10,000 | 333 |
+| Profile               | Concurrent signed-in users | Concurrent video players | Approx. heartbeat RPS at 30s |
+| --------------------- | -------------------------: | -----------------------: | ---------------------------: |
+| Normal class day      |                      1,000 |                      300 |                           10 |
+| Busy period           |                      3,000 |                    1,500 |                           50 |
+| Deliberate worst case |                     10,000 |                   10,000 |                          333 |
 
 Test a realistic mix rather than only heartbeat traffic: catalog reads, lesson detail reads, 30-second video heartbeats, checkpoint answers, reinforcement answers, completion requests and Admin progress reads.
 

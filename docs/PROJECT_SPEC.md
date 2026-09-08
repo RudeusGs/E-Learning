@@ -670,6 +670,7 @@ Các điểm sau là lựa chọn kiến trúc hiện tại, có thể thay đ�
 - Dùng JWT Bearer access token ngắn hạn giữ trong memory; refresh token opaque nằm HttpOnly cookie và rotate server-side.
 
 Nếu thay đổi các assumption này, phải đánh giá migration, API, test và hành vi người dùng trước khi code.
+
 ## Learning Guardrails — 2026-08-29
 
 The previous MVP convention allowing manual lesson completion without a score threshold is superseded.

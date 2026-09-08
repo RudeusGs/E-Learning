@@ -224,7 +224,7 @@ Product Owner yêu cầu chỉ lưu latest answer hoặc grading model khác.
 
 ## ADR-010 — Không Redis/cache server-side trong MVP
 
-**Status:** Accepted
+**Status:** Superseded by ADR-014
 
 ### Decision
 
@@ -344,6 +344,7 @@ Template:
 ```
 
 Chỉ thêm ADR cho quyết định ảnh hưởng architecture/data/security/contract lâu dài. Không dùng ADR cho tên button hoặc refactor nhỏ.
+
 ## ADR — Server-authoritative lesson completion guardrails (2026-08-29)
 
 Status: Accepted. Supersedes the previous MVP manual-complete/no-threshold convention.
@@ -351,3 +352,25 @@ Status: Accepted. Supersedes the previous MVP manual-complete/no-threshold conve
 Completion is derived from server records, not a browser button. Video watch state is tracked by bounded heartbeats, checkpoint questions can gate playback, reinforcement is unlocked after video completion, and the required reinforcement threshold is strictly greater than 80%.
 
 We intentionally do not claim YouTube is tamper-proof. Browser-side seek prevention is UX enforcement; server-side eligibility is the security boundary. High-stakes anti-tamper video would require controlled media delivery rather than public YouTube.
+
+## ADR-014 — Sử dụng Redis làm Server-side Cache
+
+**Status:** Accepted
+
+### Context
+
+Hệ thống cần nâng cao hiệu năng (performance) cho các queries có tần suất đọc lớn (read-heavy) như danh sách khóa học và chi tiết khóa học, nhằm giảm tải cho cơ sở dữ liệu.
+
+### Decision
+
+Sử dụng Redis làm Distributed Cache.
+Các Query Handlers sẽ sử dụng `ICacheService` (abstracted từ `IDistributedCache`) để áp dụng cache-aside pattern. Cấu hình TTL ngắn (ví dụ: 5 phút) để quản lý invalidation một cách đơn giản, chưa áp dụng event-driven invalidation trong giai đoạn này.
+
+### Consequences
+
+- Cần thêm service Redis vào hạ tầng (docker-compose, hosting).
+- Cần chú ý về Cache Key design để tránh lộ dữ liệu phân quyền.
+
+### Revisit when
+
+Khi hệ thống áp dụng event-driven architecture và muốn áp dụng cache invalidation realtime thay vì TTL.

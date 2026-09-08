@@ -763,6 +763,7 @@ Nếu thay request/response/error semantics:
 5. Update tài liệu này nếu contract public/stable đổi.
 
 Không silently đổi field name/status code mà chỉ sửa frontend cùng lúc vì sẽ làm bàn giao khó kiểm soát.
+
 ## Learning Guardrails — 2026-08-29
 
 `LessonWriteRequest` adds nullable `videoDurationSeconds`. A Published lesson with video requires a trusted duration.

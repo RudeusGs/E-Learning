@@ -1,4 +1,5 @@
 using Elearning.Api.Contracts.Common;
+using Elearning.Api.Contracts.Routing;
 using Elearning.Api.Contracts.Students.Responses;
 using Elearning.Api.Mappings;
 using Elearning.Api.Security;
@@ -8,7 +9,6 @@ using Elearning.Domain;
 using Microsoft.AspNetCore.Mvc;
 using StudentCreateRequest = Elearning.Api.Contracts.Students.Requests.StudentCreateRequest;
 using StudentUpdateRequest = Elearning.Api.Contracts.Students.Requests.StudentUpdateRequest;
-using Elearning.Api.Contracts.Routing;
 
 namespace Elearning.Api.Controllers;
 

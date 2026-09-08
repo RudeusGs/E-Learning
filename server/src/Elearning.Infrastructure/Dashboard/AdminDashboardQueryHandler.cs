@@ -1,3 +1,5 @@
+using Elearning.Application.Common;
+using Elearning.Application.Common.Interfaces;
 using Elearning.Application.Dashboard;
 using Elearning.Domain;
 using Elearning.Infrastructure.Identity;
@@ -7,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Elearning.Infrastructure.Dashboard;
 
 public sealed class AdminDashboardQueryHandler(
-    ElearningDbContext dbContext) : IAdminDashboardQueryHandler
+    ElearningDbContext dbContext,
+    ICacheService cacheService) : IAdminDashboardQueryHandler
 {
     private static readonly string StudentRoleName = UserRole.Student.ToIdentityName();
 
@@ -15,6 +18,13 @@ public sealed class AdminDashboardQueryHandler(
         GetAdminDashboardQuery query,
         CancellationToken cancellationToken)
     {
+        var cacheKey = CacheKeys.AdminDashboard;
+        var cachedResult = await cacheService.GetAsync<DashboardDto>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         var courseCount = await dbContext.Courses.AsNoTracking().CountAsync(
             course => course.Status != CourseStatus.Archived,
             cancellationToken);
@@ -31,6 +41,9 @@ public sealed class AdminDashboardQueryHandler(
         var completionCount = await dbContext.LessonProgress.AsNoTracking().CountAsync(
             progress => progress.Status == LessonProgressStatus.Completed,
             cancellationToken);
-        return new DashboardDto(courseCount, studentCount, lessonCount, completionCount);
+
+        var result = new DashboardDto(courseCount, studentCount, lessonCount, completionCount);
+        await cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5), cancellationToken);
+        return result;
     }
 }

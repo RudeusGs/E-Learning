@@ -96,7 +96,9 @@ const completionItems = computed(() => [
   },
   {
     label: 'Ảnh đại diện',
-    description: thumbnailReady.value ? 'URL hợp lệ hoặc có thể bỏ trống' : 'Chỉ chấp nhận URL HTTPS',
+    description: thumbnailReady.value
+      ? 'URL hợp lệ hoặc có thể bỏ trống'
+      : 'Chỉ chấp nhận URL HTTPS',
     ready: thumbnailReady.value,
   },
   {
@@ -225,7 +227,9 @@ async function submit(): Promise<void> {
 
       <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div class="max-w-2xl">
-          <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-[#eadfdd] bg-white px-3 py-1.5 text-[11px] font-bold text-[#756765] shadow-sm">
+          <div
+            class="mb-2 inline-flex items-center gap-2 rounded-full border border-[#eadfdd] bg-white px-3 py-1.5 text-[11px] font-bold text-[#756765] shadow-sm"
+          >
             <span class="size-1.5 rounded-full bg-[#c9152b]" />
             Thiết lập khóa học mới
           </div>
@@ -238,7 +242,9 @@ async function submit(): Promise<void> {
           </p>
         </div>
 
-        <div class="hidden items-center gap-2 rounded-xl border border-[#e7dedd] bg-white px-3.5 py-2.5 text-xs font-bold text-[#6f625f] shadow-sm sm:flex">
+        <div
+          class="hidden items-center gap-2 rounded-xl border border-[#e7dedd] bg-white px-3.5 py-2.5 text-xs font-bold text-[#6f625f] shadow-sm sm:flex"
+        >
           <span
             class="grid size-6 place-items-center rounded-full text-[11px]"
             :class="formReady ? 'bg-[#eaf7f0] text-[#16764f]' : 'bg-[#fff1f2] text-[#b22537]'"
@@ -276,7 +282,9 @@ async function submit(): Promise<void> {
                 </div>
               </div>
 
-              <span class="hidden rounded-md bg-[#f7f3f2] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#8b7a78] sm:inline-flex">
+              <span
+                class="hidden rounded-md bg-[#f7f3f2] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#8b7a78] sm:inline-flex"
+              >
                 1 trường bắt buộc
               </span>
             </div>
@@ -315,7 +323,12 @@ async function submit(): Promise<void> {
                 />
 
                 <div class="mt-2 min-h-5">
-                  <p v-if="titleError" id="course-title-error" role="alert" class="text-xs font-semibold text-[#b22537]">
+                  <p
+                    v-if="titleError"
+                    id="course-title-error"
+                    role="alert"
+                    class="text-xs font-semibold text-[#b22537]"
+                  >
                     {{ titleError }}
                   </p>
                   <p v-else id="course-title-help" class="text-xs leading-5 text-[#8d7c7a]">
@@ -329,7 +342,9 @@ async function submit(): Promise<void> {
                   class="mb-2 flex items-center justify-between gap-3 text-sm font-bold text-[#403735]"
                   for="course-description"
                 >
-                  <span>Mô tả <span class="font-medium text-[#9c8d8b]">(không bắt buộc)</span></span>
+                  <span
+                    >Mô tả <span class="font-medium text-[#9c8d8b]">(không bắt buộc)</span></span
+                  >
                   <span class="text-[11px] font-semibold tabular-nums text-[#a0918f]">
                     {{ form.description.length }}/4000
                   </span>
@@ -344,7 +359,8 @@ async function submit(): Promise<void> {
                   class="w-full resize-y rounded-xl border border-[#ddd4d3] bg-white px-3.5 py-3 text-sm leading-6 text-[#2d2727] outline-none transition placeholder:text-[#a99a98] focus:border-[#c9152b] focus:ring-4 focus:ring-[#c9152b]/10"
                 />
                 <p class="mt-2 text-xs leading-5 text-[#8d7c7a]">
-                  Gợi ý: viết 1–3 câu để học viên hiểu nhanh khóa học này dành cho ai và học được gì.
+                  Gợi ý: viết 1–3 câu để học viên hiểu nhanh khóa học này dành cho ai và học được
+                  gì.
                 </p>
               </div>
 
@@ -353,7 +369,9 @@ async function submit(): Promise<void> {
                   <label class="text-sm font-bold text-[#403735]" for="thumbnail-url">
                     Ảnh đại diện khóa học
                   </label>
-                  <span class="rounded-md bg-[#f7f3f2] px-2 py-1 text-[10px] font-bold text-[#8b7a78]">
+                  <span
+                    class="rounded-md bg-[#f7f3f2] px-2 py-1 text-[10px] font-bold text-[#8b7a78]"
+                  >
                     16:9 khuyến nghị
                   </span>
                 </div>
@@ -361,7 +379,9 @@ async function submit(): Promise<void> {
                 <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-start">
                   <div>
                     <div class="relative">
-                      <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]">
+                      <span
+                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]"
+                      >
                         <svg
                           class="size-5"
                           viewBox="0 0 24 24"
@@ -415,7 +435,12 @@ async function submit(): Promise<void> {
                     </div>
 
                     <div class="mt-2 min-h-5">
-                      <p v-if="thumbnailError" id="thumbnail-error" role="alert" class="text-xs font-semibold text-[#b22537]">
+                      <p
+                        v-if="thumbnailError"
+                        id="thumbnail-error"
+                        role="alert"
+                        class="text-xs font-semibold text-[#b22537]"
+                      >
                         {{ thumbnailError }}
                       </p>
                       <p v-else id="thumbnail-help" class="text-xs leading-5 text-[#8d7c7a]">
@@ -492,10 +517,14 @@ async function submit(): Promise<void> {
                   >
                     <span class="flex items-start justify-between gap-4">
                       <span>
-                        <span class="mb-2 inline-flex rounded-md bg-[#f4efee] px-2 py-1 text-[10px] font-black uppercase tracking-wide text-[#7b6c69]">
+                        <span
+                          class="mb-2 inline-flex rounded-md bg-[#f4efee] px-2 py-1 text-[10px] font-black uppercase tracking-wide text-[#7b6c69]"
+                        >
                           An toàn
                         </span>
-                        <strong class="block text-sm font-black text-[#302929]">Lưu bản nháp</strong>
+                        <strong class="block text-sm font-black text-[#302929]"
+                          >Lưu bản nháp</strong
+                        >
                         <span class="mt-1.5 block text-xs leading-5 text-[#81716f]">
                           Học viên chưa nhìn thấy. Phù hợp khi nội dung vẫn còn cần chỉnh sửa.
                         </span>
@@ -505,20 +534,30 @@ async function submit(): Promise<void> {
                         class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border"
                         :class="form.status === 'DRAFT' ? 'border-[#c9152b]' : 'border-[#cfbebc]'"
                       >
-                        <span v-if="form.status === 'DRAFT'" class="size-2.5 rounded-full bg-[#c9152b]" />
+                        <span
+                          v-if="form.status === 'DRAFT'"
+                          class="size-2.5 rounded-full bg-[#c9152b]"
+                        />
                       </span>
                     </span>
                   </span>
                 </label>
 
                 <label class="group cursor-pointer">
-                  <input v-model="form.status" type="radio" value="PUBLISHED" class="peer sr-only" />
+                  <input
+                    v-model="form.status"
+                    type="radio"
+                    value="PUBLISHED"
+                    class="peer sr-only"
+                  />
                   <span
                     class="block min-h-32 rounded-xl border border-[#e2d9d8] bg-white p-4 transition hover:-translate-y-0.5 hover:border-[#c5d9cf] hover:shadow-sm peer-checked:border-[#9fcdb7] peer-checked:bg-[#f1faf5] peer-focus-visible:ring-4 peer-focus-visible:ring-[#16875b]/10"
                   >
                     <span class="flex items-start justify-between gap-4">
                       <span>
-                        <span class="mb-2 inline-flex rounded-md bg-[#eaf7f0] px-2 py-1 text-[10px] font-black uppercase tracking-wide text-[#16764f]">
+                        <span
+                          class="mb-2 inline-flex rounded-md bg-[#eaf7f0] px-2 py-1 text-[10px] font-black uppercase tracking-wide text-[#16764f]"
+                        >
                           Hiển thị ngay
                         </span>
                         <strong class="block text-sm font-black text-[#302929]">Xuất bản</strong>
@@ -529,9 +568,14 @@ async function submit(): Promise<void> {
 
                       <span
                         class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border"
-                        :class="form.status === 'PUBLISHED' ? 'border-[#16875b]' : 'border-[#cfbebc]'"
+                        :class="
+                          form.status === 'PUBLISHED' ? 'border-[#16875b]' : 'border-[#cfbebc]'
+                        "
                       >
-                        <span v-if="form.status === 'PUBLISHED'" class="size-2.5 rounded-full bg-[#16875b]" />
+                        <span
+                          v-if="form.status === 'PUBLISHED'"
+                          class="size-2.5 rounded-full bg-[#16875b]"
+                        />
                       </span>
                     </span>
                   </span>
@@ -549,7 +593,9 @@ async function submit(): Promise<void> {
                 </div>
 
                 <div class="relative">
-                  <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8d7c7a]"
+                  >
                     <svg
                       class="size-5"
                       viewBox="0 0 24 24"
@@ -583,7 +629,12 @@ async function submit(): Promise<void> {
                 </div>
 
                 <div class="mt-2 min-h-5">
-                  <p v-if="sortOrderError" id="sort-order-error" role="alert" class="text-xs font-semibold text-[#b22537]">
+                  <p
+                    v-if="sortOrderError"
+                    id="sort-order-error"
+                    role="alert"
+                    class="text-xs font-semibold text-[#b22537]"
+                  >
                     {{ sortOrderError }}
                   </p>
                   <p v-else id="sort-order-help" class="text-xs leading-5 text-[#8d7c7a]">
@@ -596,13 +647,19 @@ async function submit(): Promise<void> {
         </div>
 
         <aside class="space-y-5 xl:sticky xl:top-24 xl:self-start">
-          <section class="overflow-hidden rounded-2xl border border-[#e4dbda] bg-white shadow-[0_8px_26px_rgba(65,28,34,0.055)]">
+          <section
+            class="overflow-hidden rounded-2xl border border-[#e4dbda] bg-white shadow-[0_8px_26px_rgba(65,28,34,0.055)]"
+          >
             <div class="flex items-center justify-between border-b border-[#eee6e4] px-5 py-3.5">
               <div>
                 <p class="text-sm font-black text-[#302929]">Xem trước</p>
-                <p class="mt-0.5 text-[11px] font-medium text-[#948582]">Thẻ khóa học phía học viên</p>
+                <p class="mt-0.5 text-[11px] font-medium text-[#948582]">
+                  Thẻ khóa học phía học viên
+                </p>
               </div>
-              <span class="rounded-md bg-[#f5f1f0] px-2 py-1 text-[10px] font-bold text-[#7e706d]">Live</span>
+              <span class="rounded-md bg-[#f5f1f0] px-2 py-1 text-[10px] font-bold text-[#7e706d]"
+                >Live</span
+              >
             </div>
 
             <div class="relative aspect-[16/8.5] overflow-hidden bg-[#f3eeee]">
@@ -615,12 +672,18 @@ async function submit(): Promise<void> {
               />
 
               <div v-else class="course-preview-grid absolute inset-0">
-                <div class="absolute -right-10 -top-12 size-40 rounded-full border border-[#ead4d6] bg-[#fff4f5]" />
-                <div class="absolute bottom-4 left-5 size-10 rounded-xl border border-[#ebd5d7] bg-white/70" />
+                <div
+                  class="absolute -right-10 -top-12 size-40 rounded-full border border-[#ead4d6] bg-[#fff4f5]"
+                />
+                <div
+                  class="absolute bottom-4 left-5 size-10 rounded-xl border border-[#ebd5d7] bg-white/70"
+                />
                 <div class="absolute bottom-7 left-20 h-px w-28 -rotate-6 bg-[#dcbfc2]" />
               </div>
 
-              <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/25 to-transparent" />
+              <div
+                class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/25 to-transparent"
+              />
             </div>
 
             <div class="p-5">
@@ -635,12 +698,16 @@ async function submit(): Promise<void> {
                 >
                   {{ form.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp' }}
                 </span>
-                <span class="rounded-md bg-[#f1edec] px-2 py-1 text-[10px] font-bold text-[#766866]">
+                <span
+                  class="rounded-md bg-[#f1edec] px-2 py-1 text-[10px] font-bold text-[#766866]"
+                >
                   Thứ tự {{ form.sortOrder }}
                 </span>
               </div>
 
-              <h3 class="line-clamp-2 text-[17px] font-black leading-6 tracking-[-0.02em] text-[#302929]">
+              <h3
+                class="line-clamp-2 text-[17px] font-black leading-6 tracking-[-0.02em] text-[#302929]"
+              >
                 {{ previewTitle }}
               </h3>
               <p class="mt-2 line-clamp-3 text-sm leading-6 text-[#81716f]">
@@ -649,11 +716,15 @@ async function submit(): Promise<void> {
             </div>
           </section>
 
-          <section class="rounded-2xl border border-[#e4dbda] bg-white p-5 shadow-[0_4px_18px_rgba(65,28,34,0.035)]">
+          <section
+            class="rounded-2xl border border-[#e4dbda] bg-white p-5 shadow-[0_4px_18px_rgba(65,28,34,0.035)]"
+          >
             <div class="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h3 class="text-sm font-black text-[#302929]">Kiểm tra trước khi tạo</h3>
-                <p class="mt-1 text-xs leading-5 text-[#8b7c79]">Các mục quan trọng được kiểm tra tự động.</p>
+                <p class="mt-1 text-xs leading-5 text-[#8b7c79]">
+                  Các mục quan trọng được kiểm tra tự động.
+                </p>
               </div>
 
               <span
@@ -669,11 +740,15 @@ async function submit(): Promise<void> {
                 v-for="item in completionItems"
                 :key="item.label"
                 class="flex items-start gap-3 rounded-xl border px-3.5 py-3"
-                :class="item.ready ? 'border-[#dfeae4] bg-[#f8fcfa]' : 'border-[#eee3e1] bg-[#fcfaf9]'"
+                :class="
+                  item.ready ? 'border-[#dfeae4] bg-[#f8fcfa]' : 'border-[#eee3e1] bg-[#fcfaf9]'
+                "
               >
                 <span
                   class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full"
-                  :class="item.ready ? 'bg-[#dff3e9] text-[#16764f]' : 'bg-[#f1e9e8] text-[#9b8b89]'"
+                  :class="
+                    item.ready ? 'bg-[#dff3e9] text-[#16764f]' : 'bg-[#f1e9e8] text-[#9b8b89]'
+                  "
                 >
                   <svg
                     v-if="item.ready"
@@ -721,7 +796,9 @@ async function submit(): Promise<void> {
       <div
         class="sticky bottom-0 z-20 -mx-4 -mb-4 mt-7 border-t border-[#e5dcdb] bg-[#f8f7f5]/95 px-4 py-3.5 shadow-[0_-10px_30px_rgba(53,31,31,0.04)] backdrop-blur sm:-mx-5 sm:-mb-5 sm:px-5 lg:-mx-6 lg:px-6"
       >
-        <div class="mx-auto flex max-w-[1360px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          class="mx-auto flex max-w-[1360px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
           <div class="hidden min-w-0 sm:block">
             <div class="flex items-center gap-2">
               <span
@@ -761,7 +838,14 @@ async function submit(): Promise<void> {
                 fill="none"
                 aria-hidden="true"
               >
-                <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
+                <circle
+                  class="opacity-30"
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  stroke-width="3"
+                />
                 <path
                   d="M21 12a9 9 0 0 0-9-9"
                   stroke="currentColor"

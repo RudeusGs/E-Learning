@@ -13,6 +13,7 @@ public static class DependencyInjection
         IHostEnvironment environment)
     {
         services.AddDatabaseInfrastructure(configuration);
+        services.AddCacheInfrastructure(configuration);
         services.AddIdentityInfrastructure();
         services.AddJwtAuthenticationInfrastructure(configuration, environment);
         services.AddAuthenticationModule();
